@@ -273,7 +273,7 @@ def generate_trade(dateFrom=None,dateTo=None):
     except Exception:
         return generate_trade(dateFrom,dateTo)
 
-    trade['rate'] = rate
+    trade['rate'] = round(rate,5)
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
     trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
     return trade
