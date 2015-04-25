@@ -225,15 +225,24 @@ def random_amount():
         x = random.randint(1,5) * 1000000
     return round(abs(random.gauss(x,x/5)))
 
-def generate_trade(dateFrom=None,dateTo=None):
+def generate_trade(dateFrom=None,dateTo=None,live=False,today=False):
     trade = dict()
     trade['userId'] = get_weighted_userid()
 
-    # weight the date
-    if dateFrom is None and dateTo is None:
-        timePlaced = random_weighted_date()
+    if live is True or today is True:
+        t = time.gmtime()
+        format='%d-%b-%y %H:%M:%S'
+        dateFrom = time.strftime(format, t)
+        if live is True:
+            timePlaced = dateFrom
+        else:
+            timePlaced = random_date()
     else:
-        timePlaced = random_date(dateFrom,dateTo)
+        # weight the date
+        if dateFrom is None and dateTo is None:
+            timePlaced = random_weighted_date()
+        else:
+            timePlaced = random_date(dateFrom,dateTo)
 
     trade['timePlaced'] = timePlaced
     year_rates = rates['20' + trade['timePlaced'][7:9]]['rates']
@@ -304,18 +313,12 @@ def generate_trades_to_sum(max=50000000,dateFrom=None,dateTo=None,today=False,li
     total = 0
     i = 0
     max = abs(random.gauss(max,max/4.5))
-    if live is True or today is True:
-        t = time.gmtime()
-        format='%d-%b-%y %H:%M:%S'
-        dateFrom = time.strftime(format, t)
 
     while total < max:
-        trade = generate_trade(dateFrom=dateFrom,dateTo=dateTo)
+        trade = generate_trade(dateFrom=dateFrom,dateTo=dateTo,live=live,today=today)
         total = total + trade['amountBuyEur']
         del trade['amountBuyEur']
         i = i + 1
-        if live is True:
-            trade['timePlaced'] = dateFrom
         trades.append(trade)
 
     if return_json is True:
