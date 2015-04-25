@@ -21,6 +21,12 @@ __status__ = "Development"
 
 
 def load_json(filename, key):
+    """
+    Load in a JSON file and return it indexed by a key
+    :param filename: json file to load
+    :param key: index data with this attribute key
+    :return: dict of objects indexed by key
+    """
     with codecs.open(filename, 'r', 'utf8') as fh:
         objects = json.loads(fh.read())
     data = dict()
@@ -41,7 +47,16 @@ def get_languages(filename='../data/languages.json', key='alpha2'):
     return load_json(filename, key)
 
 
+def get_rates(filename='../data/rates.json', key='year'):
+    return load_json(filename, key)
+
+
 def get_regions(filename='../data/regions.json'):
+    """
+    Return groups of countries indexed by a region name
+    :param filename:
+    :return: dict of countries indexed by region name
+    """
     with codecs.open(filename, 'r', 'utf8') as fh:
         objects = json.loads(fh.read())
     data = dict()
@@ -50,26 +65,27 @@ def get_regions(filename='../data/regions.json'):
     return data
 
 
-def get_rates(filename='../data/rates.json', key='year'):
-    return load_json(filename, key)
+def get_weighted_userid(year):
+    """
+    Get a user ID value weighted
+    :return: uid in range for that year
+    """
+    if year == 2010:
+        x = 5000
+    elif year == 2011:
+        x = 20000
+    elif year == 2012:
+        x = 30000
+    elif year == 2013:
+        x = 40000
+    elif year == 2014:
+        x = 50000
+    elif year == 2015:
+        x = 65000
+    else:
+        x = 100000
 
-
-def get_weighted_userid():
-    x = 0
-    n = random.randint(1, 6)
-    if n is 1:
-        x = random.randint(1, 3000)
-    elif n is 2:
-        x = random.randint(1, 8000)
-    elif n is 3:
-        x = random.randint(1, 17000)
-    elif n is 4:
-        x = random.randint(1, 33000)
-    elif n is 5:
-        x = random.randint(1, 48000)
-    elif n is 6:
-        x = random.randint(1, 65000)
-    return x
+    return random.randint(1, x)
 
 
 def random_weighted_country():
@@ -231,7 +247,6 @@ def random_amount():
 def generate_trade(date_from=None, date_to=None, live=False, today=False,
                    return_json=False):
     trade = dict()
-    trade['userId'] = get_weighted_userid()
 
     if live is True or today is True:
         t = time.gmtime()
@@ -283,6 +298,10 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
     amount_sell = random_amount()
     if currency_from == 'EUR':
         eur_amount = amount_sell
+        if not currency_from in year_rates:
+            return generate_trade(date_from=date_from, date_to=date_to,
+                                  live=live,
+                                  today=today, return_json=return_json)
         rate = year_rates[currency_to]
         rate = abs(random.gauss(rate, 0.02))
         amount_buy = eur_amount * rate
@@ -303,6 +322,8 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
         round(amount_buy, currencies[currency_to]['decimals']))
     trade['amountBuyEur'] = float(
         round(eur_amount, currencies[currency_to]['decimals']))
+
+    trade['userId'] = get_weighted_userid(int("20" + str(trade['timePlaced'][7:9])))
 
     if return_json is True:
         del trade['amountBuyEur']
@@ -346,7 +367,7 @@ def setup_global_data():
 setup_global_data()
 
 if __name__ in '__main__':
-    pass
-#    trades = generate_trades_to_sum(10000000, live=False, today=True)
-#    print(trades)
+#    pass
+    trades = generate_trades_to_sum(10000000, live=False, today=False)
+    print(trades)
 #    print(generate_trade(return_json=True, live=True))
