@@ -40,12 +40,18 @@ Based on the example:
 Usage: generate.py [OPTIONS]
 
 Options:
-  --live              Simulate a live trade?
-  --today             Simulate a trade made today?
-  --historic          Simulate historic data?
-  --quantity INTEGER  How many trades to generate?
-  --amount INTEGER    Generate a random number of trades totalling this amount
-                      equivalent in EUR
+  -l, --live              Simulate a live trade?
+  -t, --today             Simulate a trade made today?
+  -h, --historic          Simulate historic data?
+  -q, --quantity INTEGER  Exact number of trades to generate?
+  -a, --amount INTEGER    Generate a random number of trades totalling APPROX
+                          this amount equivalent in EUR
+  -s, --datestart TEXT    Enter date range start: format "01-JAN-2015
+                          00:00:00"
+  -e, --dateend TEXT      Enter date range end: format "01-JAN-2015 00:00:00"
+  -c, --csv               Output CSV instead of JSON?
+  -v, --verbose
+  --help                  Show this message and exit.
   --help              Show this message and exit.
 </pre>
 ######Examples
