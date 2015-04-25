@@ -290,4 +290,9 @@ def setup_global_data():
 
 if __name__ in '__main__':
     setup_global_data()
-    print(generate_trade())
+    print('[')
+    for x in range(1000):
+        trade = generate_trade()
+        print(json.dumps(trade))
+        print(',')
+    print(']')
