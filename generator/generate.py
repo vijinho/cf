@@ -8,6 +8,7 @@ import codecs
 import json
 import random
 import time
+import functools
 
 from builtins import *
 
@@ -51,13 +52,8 @@ def get_regions(filename='../data/regions.json'):
         data[region] = country
     return data
 
-def setup_global_data():
-    global countries, currencies, languages, regions, eurozone
-    countries = get_countries()
-    currencies = get_currencies()
-    languages = get_languages()
-    regions = get_regions()
-    eurozone = regions['eurozone']
+def get_rates(filename='../data/rates.json', key='year'):
+    return load_json(filename, key)
 
 def get_weighted_userid():
     x = 0
@@ -93,7 +89,7 @@ def random_weighted_country():
         elif n > 80 and n < 85:
             country = 'NL'
         else:
-            country = "".join(random.sample(regions['eurozone'],1))
+            country = "".join(random.sample(eurozone,1))
     elif n > 50 and n <= 70:
         country = 'US'
     elif n > 70 and n <= 80:
@@ -147,6 +143,10 @@ def random_weighted_currency():
         currency = 'NOK'
     else:
         currency = "".join(random.sample(currencies.keys(),1))
+
+    if (currency not in accepted_currencies):
+        return random_weighted_currency()
+
     return currency
 
 def str_time_prop(start, end, format, prop):
@@ -189,6 +189,36 @@ def random_weighted_date():
         dateTo = "01JAN11 00:00:00"
     return random_date(dateFrom,dateTo)
 
+def random_amount():
+    n = random.randint(0,100)
+    x = 0
+    y = 0
+    if n <= 5:
+        x = 1000
+        y = 300
+    elif n > 10 and n <= 25:
+        x = 5000
+        y = 1500
+    elif n > 25 and n <= 50:
+        x = 25000
+        y = 10000
+    elif n > 50 and n <= 70:
+        x = 30000
+        y = 20000
+    elif n > 70 and n <= 85:
+        x = 500000
+        y = 300000
+    elif n > 85 and n <= 95:
+        x = 1000000
+        y = 4000000
+    elif n > 95 and n <= 97:
+        x = 5000000
+        y = 3000000
+    elif n > 97 and n <= 100:
+        x = 50000000
+        y = 30000000
+    return abs(random.gauss(x,y))
+
 def generate_trade(dateFrom=None,dateTo=None):
     trade = dict()
     trade['userId'] = get_weighted_userid()
@@ -216,21 +246,34 @@ def generate_trade(dateFrom=None,dateTo=None):
             if x is 1:
                 currencyFrom = ccurrencies[0]
             elif x > 1:
-                currencyFrom = "".join(random.sample(ccurrencies,1))
+                currencyFrom = "".join(random.sample(accepted_currencies,1))
         else:
             currencyFrom = random_weighted_currency()
 
     trade['originatingCountry'] = originatingCountry
     trade['currencyFrom'] = currencyFrom
+
     currencyTo = currencyFrom
     while currencyTo is currencyFrom:
         currencyTo = random_weighted_currency()
     trade['currencyTo'] = currencyTo
 
-#    print(currencies[currencyTo])
+    amountSell = random_amount()
+
+    trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
+
     return trade
+
+def setup_global_data():
+    global countries, currencies, languages, regions, eurozone, rates, accepted_currencies
+    countries = get_countries()
+    currencies = get_currencies()
+    languages = get_languages()
+    regions = get_regions()
+    eurozone = regions['eurozone']
+    rates = get_rates()
+    accepted_currencies = list(rates['2015']['rates'].keys())
 
 if __name__ in '__main__':
     setup_global_data()
     print(generate_trade())
-    print(len(regions['eurozone']))

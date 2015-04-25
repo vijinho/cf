@@ -39,13 +39,12 @@ I wanted to make as realistic a simulator to real data as possible so I tried to
 
 - **userId**: Randomize between 1 and 65,000
 - **currencyFrom/To**: Get list from (20 currencies supported, 17 from, 20 to, 30 in 2015)
-- **amountSell**: Randomize between 15 and 50,000,000
+- **amountSell**: Randomize between 15 and 5000000
 - **amountBuy**: (amountSell * rate) 
 - **rate**: (is currencyFrom into currencyTo)
 - **timePlaced**: (DDmonYY HH:MM:SS) Any date since May 2010
 - **originatingCountry**: (from currencyFrom user)
 
-**Note** simulator won't be using historical rates.
 
 Data: I created [ISO Country Data](https://github.com/vijinho/ISO-Country-Data) as a spin-off from this project.
 
@@ -64,7 +63,8 @@ My random thinking into the generator:
 - Size of transfer like Pareto's 80/20 rule - 70/30
 - Size of payments: Benford's Law - 30% of all payments the first digit of the amount is a 1, while it is a 9 for only 5% of payments
 - 2008-11 The geographical distribution of trade finance (SWIFT transfers), trade credit insurance and trade  (approx) % Asia-Pacific (55), Europe (25), Middle-East (8), Africa (5), North America (5), Latin America (2)
-- Do not bother with historical rates
+ - Use [fixer.io historical rates but limit per year](http://fixer.io/) 
+ - Only use currencies which we have rates for
  
 **Sources**
 
