@@ -89,6 +89,10 @@ def get_weighted_userid(year):
 
 
 def random_weighted_country():
+    """
+    Return a random country, weighted by assumed frequency of trade
+    :return: 2 char country code
+    """
     n = random.randint(1, 100)
     if n < 50:
         # weigh the EURO country
@@ -125,6 +129,10 @@ def random_weighted_country():
 
 
 def random_weighted_currency():
+    """
+    Return a random accepted currency weighted by importance in trade frequency
+    :return: 3 char currency code
+    """
     # choose currency by share of world trade
     n = random.randint(1, 100)
     if n <= 27:
@@ -167,6 +175,14 @@ def random_weighted_currency():
 
 
 def str_time_prop(start, end, ts_format, prop):
+    """
+    format a date time string
+    :param start: timestamp
+    :param end: timestamp
+    :param ts_format: format for timestamp
+    :param prop: time difference range
+    :return:
+    """
     start_time = time.mktime(time.strptime(start, ts_format))
     end_time = time.mktime(time.strptime(end, ts_format))
     ptime = start_time + prop * (end_time - start_time)
@@ -174,6 +190,14 @@ def str_time_prop(start, end, ts_format, prop):
 
 
 def random_date(start=None, end=None, prop=None, ts_format='%d-%b-%y %H:%M:%S'):
+    """
+    Return a random date/time timestamp, weighted by EU office hours for larger frequency of trades
+    :param start:
+    :param end:
+    :param prop:
+    :param ts_format:
+    :return:
+    """
     if start is None:
         t = time.gmtime()
         start = time.strftime(ts_format, t)
@@ -198,6 +222,10 @@ def random_date(start=None, end=None, prop=None, ts_format='%d-%b-%y %H:%M:%S'):
 
 
 def random_weighted_date():
+    """
+    Return a random date from the sdate of the first trade in the system to the present day
+    :return: formatted timestamp
+    """
     n = random.randint(0, 100)
     if n <= 25:
         date_from = "01-JAN-15 00:00:00"
@@ -221,6 +249,10 @@ def random_weighted_date():
 
 
 def random_amount():
+    """
+    Get a weighted random amount for a currency transfer
+    :return: currency amount
+    """
     n = random.randint(0, 10000)
     x = 0
     if n <= 5000:
@@ -246,6 +278,15 @@ def random_amount():
 
 def generate_trade(date_from=None, date_to=None, live=False, today=False,
                    return_json=False):
+    """
+    Generate a random trade
+    :param date_from: the date range start point timestamp
+    :param date_to: the date range end point timestamp
+    :param live: create a live trade from this moment
+    :param today: create a trade that was made at some point today
+    :param return_json: return the trade as json
+    :return:
+    """
     trade = dict()
 
     if live is True or today is True:
@@ -298,7 +339,7 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
     amount_sell = random_amount()
     if currency_from == 'EUR':
         eur_amount = amount_sell
-        if not currency_from in year_rates:
+        if not currency_from in year_rates or not currency_to in year_rates:
             return generate_trade(date_from=date_from, date_to=date_to,
                                   live=live,
                                   today=today, return_json=return_json)
@@ -306,7 +347,7 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
         rate = abs(random.gauss(rate, 0.02))
         amount_buy = eur_amount * rate
     else:
-        if not currency_from in year_rates:
+        if not currency_from in year_rates or not currency_to in year_rates:
             return generate_trade(date_from=date_from, date_to=date_to,
                                   live=live,
                                   today=today, return_json=return_json)
@@ -333,6 +374,16 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
 
 def generate_trades_to_sum(max_sum=50000000, date_from=None, date_to=None,
                            today=False, live=False, return_json=True):
+    """
+    Generate a list of trades
+    :param max_sum: the approx maximum total value of all trades
+    :param date_from: the date range start timestamp
+    :param date_to: the date tange end timestamp
+    :param today: get a list of random trades for this day
+    :param live: get a list of randoom trades for this point in time
+    :param return_json: return data as json
+    :return:
+    """
     trades_list = list()
     total = 0
     i = 0
@@ -353,6 +404,10 @@ def generate_trades_to_sum(max_sum=50000000, date_from=None, date_to=None,
 
 
 def setup_global_data():
+    """
+    setup some global variables used by the rest of the functions
+    :return:
+    """
     global countries, currencies, languages, regions, eurozone
     global rates, accepted_currencies
     countries = get_countries()
@@ -367,7 +422,7 @@ def setup_global_data():
 setup_global_data()
 
 if __name__ in '__main__':
-#    pass
-    trades = generate_trades_to_sum(10000000, live=False, today=False)
-    print(trades)
+    pass
+#    trades = generate_trades_to_sum(10000000, live=False, today=False)
+#    print(trades)
 #    print(generate_trade(return_json=True, live=True))
