@@ -422,12 +422,16 @@ def setup_global_data():
 setup_global_data()
 
 @click.command()
-@click.option('--live', is_flag=True, default=False, help="Simulate a live trade?")
-@click.option('--today', is_flag=True, default=False, help="Simulate a trade made today?")
-@click.option('--historic', is_flag=True, default=False, help="Simulate historic data?")
-@click.option('--quantity', default=1, help="Exact number of trades to generate?")
-@click.option('--amount', default=0, help="Generate a random number of trades totalling APPROX this amount equivalent in EUR")
-def generate(live,today,historic,quantity,amount):
+@click.option('--live', '-l', is_flag=True, default=False, help="Simulate a live trade?")
+@click.option('--today', '-t', is_flag=True, default=False, help="Simulate a trade made today?")
+@click.option('--historic', '-h', is_flag=True, default=False, help="Simulate historic data?")
+@click.option('--quantity', '-q', default=1, help="Exact number of trades to generate?")
+@click.option('--amount', '-a', default=0, help="Generate a random number of trades totalling APPROX this amount equivalent in EUR")
+@click.option('--datestart', '-s', default=None, help='Enter date range start: format "01-JAN-2015 00:00:00"')
+@click.option('--dateend', '-e', default=None, help='Enter date range end: format "01-JAN-2015 00:00:00"')
+@click.option('--csv', '-c', is_flag=True, default=False, help="Output CSV instead of JSON?")
+@click.option('-v', '--verbose', count=True)
+def generate(live,today,historic,quantity,amount,datestart,dateend,csv,verbose):
     if today is True:
         historic = False
     if live is True:
@@ -440,11 +444,11 @@ def generate(live,today,historic,quantity,amount):
     if amount == 0:
         trades_list = list()
         for i in range(0,quantity):
-            trade = generate_trade(return_json=True,live=live,today=today)
+            trade = generate_trade(return_json=True,live=live,today=today,date_from=datestart,date_to=dateend)
             trades_list.append(trade)
         print(json.dumps(trades_list, indent=4, sort_keys=True))
     else:
-        print(generate_trades_to_sum(return_json=True,live=live,today=today,max_sum=amount))
+        print(generate_trades_to_sum(return_json=True,live=live,today=today,max_sum=amount,date_from=datestart,date_to=dateend))
 
 if __name__ == '__main__':
     generate()
