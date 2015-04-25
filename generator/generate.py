@@ -35,23 +35,23 @@ def load_json(filename, key):
     return data
 
 
-def get_countries(filename='../data/countries.json', key='alpha2'):
+def get_countries(filename='data/countries.json', key='alpha2'):
     return load_json(filename, key)
 
 
-def get_currencies(filename='../data/currencies.json', key='code'):
+def get_currencies(filename='data/currencies.json', key='code'):
     return load_json(filename, key)
 
 
-def get_languages(filename='../data/languages.json', key='alpha2'):
+def get_languages(filename='data/languages.json', key='alpha2'):
     return load_json(filename, key)
 
 
-def get_rates(filename='../data/rates.json', key='year'):
+def get_rates(filename='data/rates.json', key='year'):
     return load_json(filename, key)
 
 
-def get_regions(filename='../data/regions.json'):
+def get_regions(filename='data/regions.json'):
     """
     Return groups of countries indexed by a region name
     :param filename:

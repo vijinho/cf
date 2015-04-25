@@ -3943,9 +3943,9 @@
     },
     {
         "alpha2":"UK",
-        "alpha3":"",
+        "alpha3":"GBR",
         "countryCallingCodes":[
-
+            "+44"
         ],
         "currencies":[
             "GBP"
