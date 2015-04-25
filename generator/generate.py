@@ -328,6 +328,6 @@ def generate_trades_to_sum(max=50000000,dateFrom=None,dateTo=None,today=False,li
 
 if __name__ in '__main__':
     setup_global_data()
-    trades = generate_trades_to_sum(10000000,live=False,today=True)
-    print(trades)
+#    trades = generate_trades_to_sum(10000000,live=False,today=True)
+#    print(trades)
     print(generate_trade(return_json=True,live=True))
