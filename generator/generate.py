@@ -299,20 +299,31 @@ def setup_global_data():
     rates = get_rates()
     accepted_currencies = list(rates['2015']['rates'].keys())
 
-def generate_trades_to_sum(max=50000000):
+def generate_trades_to_sum(max=50000000,dateFrom=None,dateTo=None,today=False,live=False,return_json=True):
     trades = list()
     total = 0
     i = 0
     max = abs(random.gauss(max,max/4.5))
+    if live is True or today is True:
+        t = time.gmtime()
+        format='%d-%b-%y %H:%M:%S'
+        dateFrom = time.strftime(format, t)
+
     while total < max:
-        trade = generate_trade(dateFrom='25-APR-15 00:00:00')
+        trade = generate_trade(dateFrom=dateFrom,dateTo=dateTo)
         total = total + trade['amountBuyEur']
         del trade['amountBuyEur']
         i = i + 1
+        if live is True:
+            trade['timePlaced'] = dateFrom
         trades.append(trade)
-    return trades
+
+    if return_json is True:
+        return json.dumps(trades, indent=4, sort_keys=True)
+    else:
+        return trades
 
 if __name__ in '__main__':
     setup_global_data()
-    trades = generate_trades_to_sum(10000000)
-    print(json.dumps(trades, indent=4, sort_keys=True))
+    trades = generate_trades_to_sum(10000000,live=False,today=True)
+    print(trades)

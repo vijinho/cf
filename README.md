@@ -42,7 +42,7 @@ I wanted to make as realistic a simulator to real data as possible so I tried to
 - **amountSell**: Randomize between 15 and 5000000
 - **amountBuy**: (amountSell * rate) 
 - **rate**: (is currencyFrom into currencyTo)
-- **timePlaced**: (DDmonYY HH:MM:SS) Any date since May 2010
+- **timePlaced**: (DD-XXX-YY HH:MM:SS) Any date since May 2010
 - **originatingCountry**: (from currencyFrom user)
 - **amountBuyEur** temporary extra field - the amount bought valued in EUROs for calculating totals for a time period
 
