@@ -256,23 +256,26 @@ def generate_trade(dateFrom=None,dateTo=None):
     trade['currencyFrom'] = currencyFrom
 
     currencyTo = currencyFrom
-    while currencyTo is currencyFrom:
+    while currencyTo == currencyFrom:
         currencyTo = random_weighted_currency()
     trade['currencyTo'] = currencyTo
 
     amountSell = random_amount()
-    if currencyFrom is 'EUR':
-        eurAmount = amountSell
-    else:
-        eurAmount = amountSell / year_rates[currencyFrom]
-
-    amountBuy = eurAmount * year_rates[currencyTo]
-    rate = amountBuy / eurAmount
+    try:
+        if currencyFrom == 'EUR':
+            eurAmount = amountSell
+            amountBuy = eurAmount * year_rates[currencyTo]
+            rate = year_rates[currencyTo]
+        else:
+            eurAmount = amountSell / year_rates[currencyFrom]
+            amountBuy = eurAmount * year_rates[currencyTo]
+            rate = amountBuy / eurAmount
+    except Exception:
+        return generate_trade(dateFrom,dateTo)
 
     trade['rate'] = rate
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
     trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
-
     return trade
 
 def setup_global_data():
