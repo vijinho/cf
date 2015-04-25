@@ -37,14 +37,14 @@ Based on the example:
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
 
-- **userId**: Randomize between 1 and 65,000
+- **userId**: Randomize between 1 and 65,000 (depending on year)
 - **currencyFrom/To**: Get list from (20 currencies supported, 17 from, 20 to, 30 in 2015)
 - **amountSell**: Randomize between 15 and 5000000
 - **amountBuy**: (amountSell * rate) 
 - **rate**: (is currencyFrom into currencyTo)
 - **timePlaced**: (DDmonYY HH:MM:SS) Any date since May 2010
 - **originatingCountry**: (from currencyFrom user)
-
+- **amountBuyEur** temporary extra field - the amount bought valued in EUROs for calculating totals for a time period
 
 Data: I created [ISO Country Data](https://github.com/vijinho/ISO-Country-Data) as a spin-off from this project.
 
@@ -52,12 +52,13 @@ Data: I created [ISO Country Data](https://github.com/vijinho/ISO-Country-Data) 
 * Python3-compatible - aided by [Python Future](http://python-future.org/quickstart.html#installation) and [2to3](https://docs.python.org/2/library/2to3.html)
 
 
-
 My random thinking into the generator:
 
 - CF: 600,000,000, 30,000 customers by Nov 2011
 - CF: 5m euros/day average (add 1m for each year from May 2010)
 - CF: 1.8 billion so far
+- Estimate around median 20,000 transactions/€50million daily
+- Estimate 70% of transactions during european office hours
 - Int transfers: Median €5000, Average €400,000
 - EU transfers: 89m x €6827, 64m x 1138, 2009, UK 34.6m x £2598
 - Size of transfer like Pareto's 80/20 rule - 70/30

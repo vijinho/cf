@@ -165,7 +165,19 @@ def random_date(start=None, end=None, prop=None, format='%d-%b-%y %H:%M:%S'):
         end = time.strftime(format, t)
     if prop is None:
         prop = random.random()
-    return str_time_prop(start, end, format, prop).upper()
+    d = str_time_prop(start, end, format, prop).upper()
+    if random.randint(1,10) <= 7:
+        min = 8
+        max = 18
+    else:
+        min = 0
+        max = 23
+    d = "".join([d[0:10],"{hour:02d}:{min:02d}:{sec:02d}".format(
+            hour=random.randint(min,max),
+            min=random.randint(0,59),
+            sec=random.randint(0,59)
+        )])
+    return d
 
 def random_weighted_date():
     n = random.randint(0,100)
@@ -190,34 +202,28 @@ def random_weighted_date():
     return random_date(dateFrom,dateTo)
 
 def random_amount():
-    n = random.randint(0,100)
+    n = random.randint(0,10000)
     x = 0
     y = 0
-    if n <= 5:
-        x = 1000
-        y = 300
-    elif n > 10 and n <= 25:
-        x = 5000
-        y = 1500
-    elif n > 25 and n <= 50:
-        x = 25000
-        y = 10000
-    elif n > 50 and n <= 70:
-        x = 30000
-        y = 20000
-    elif n > 70 and n <= 85:
-        x = 500000
-        y = 300000
-    elif n > 85 and n <= 95:
-        x = 1000000
-        y = 4000000
-    elif n > 95 and n <= 97:
-        x = 5000000
-        y = 3000000
-    elif n > 97 and n <= 100:
-        x = 50000000
-        y = 30000000
-    return abs(random.gauss(x,y))
+    if n <= 5000:
+        x = random.randint(1,3) * 500
+    elif n > 5000 and n <= 6500:
+        x = random.randint(1,5) * 1000
+    elif n > 6500 and n <= 8000:
+        x = random.randint(1,2) * 5000
+    elif n > 8000 and n <= 8500:
+        x = random.randint(1,3) * 250
+    elif n > 8500 and n <= 9950:
+        x = random.randint(1,3) * 500
+    elif n > 9950 and n <= 9990:
+        x = random.randint(1,5) * 5000
+    elif n > 9990 and n <= 9995:
+        x = random.randint(1,5) * 50000
+    elif n > 9995 and n <= 9999:
+        x = random.randint(1,5) * 100000
+    elif n > 9999 and n <= 10000:
+        x = random.randint(1,5) * 1000000
+    return round(abs(random.gauss(x,x/5)))
 
 def generate_trade(dateFrom=None,dateTo=None):
     trade = dict()
@@ -264,18 +270,21 @@ def generate_trade(dateFrom=None,dateTo=None):
     try:
         if currencyFrom == 'EUR':
             eurAmount = amountSell
-            amountBuy = eurAmount * year_rates[currencyTo]
             rate = year_rates[currencyTo]
+            rate = abs(random.gauss(rate,0.02))
+            amountBuy = eurAmount * rate
         else:
             eurAmount = amountSell / year_rates[currencyFrom]
             amountBuy = eurAmount * year_rates[currencyTo]
             rate = amountBuy / eurAmount
+            rate = abs(random.gauss(rate,0.02))
     except Exception:
         return generate_trade(dateFrom,dateTo)
 
     trade['rate'] = round(rate,5)
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
     trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
+    trade['amountBuyEur'] = float(round(eurAmount, currencies[currencyTo]['decimals']))
 
 #    trade = collections.OrderedDict(sorted(trade.items()))
     return trade
@@ -290,12 +299,20 @@ def setup_global_data():
     rates = get_rates()
     accepted_currencies = list(rates['2015']['rates'].keys())
 
+def generate_trades_to_sum(max=50000000):
+    trades = list()
+    total = 0
+    i = 0
+    max = abs(random.gauss(max,max/4.5))
+    while total < max:
+        trade = generate_trade(dateFrom='25-APR-15 00:00:00')
+        total = total + trade['amountBuyEur']
+        del trade['amountBuyEur']
+        i = i + 1
+        trades.append(trade)
+    return trades
+
 if __name__ in '__main__':
     setup_global_data()
-
-    trades = list()
-    for x in range(5):
-        trade = generate_trade()
-        trades.append(trade)
-
+    trades = generate_trades_to_sum(10000000)
     print(json.dumps(trades, indent=4, sort_keys=True))
