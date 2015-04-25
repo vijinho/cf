@@ -51,32 +51,35 @@ def get_regions(filename='../data/regions.json'):
         data[region] = country
     return data
 
+
 def get_rates(filename='../data/rates.json', key='year'):
     return load_json(filename, key)
 
+
 def get_weighted_userid():
     x = 0
-    n = random.randint(1,6)
+    n = random.randint(1, 6)
     if n is 1:
-        x = random.randint(1,3000)
+        x = random.randint(1, 3000)
     elif n is 2:
-        x = random.randint(1,8000)
+        x = random.randint(1, 8000)
     elif n is 3:
-        x = random.randint(1,17000)
+        x = random.randint(1, 17000)
     elif n is 4:
-        x = random.randint(1,33000)
+        x = random.randint(1, 33000)
     elif n is 5:
-        x = random.randint(1,48000)
+        x = random.randint(1, 48000)
     elif n is 6:
-        x = random.randint(1,65000)
+        x = random.randint(1, 65000)
     return x
 
+
 def random_weighted_country():
-    n = random.randint(1,100)
+    n = random.randint(1, 100)
     if n < 50:
         currency = 'EUR'
         # weigh the EURO country
-        n = random.randint(1,100)
+        n = random.randint(1, 100)
         if n <= 20:
             country = 'DE'
         elif n > 20 and n <= 45:
@@ -88,13 +91,13 @@ def random_weighted_country():
         elif n > 80 and n < 85:
             country = 'NL'
         else:
-            country = "".join(random.sample(eurozone,1))
+            country = "".join(random.sample(eurozone, 1))
     elif n > 50 and n <= 70:
         country = 'US'
     elif n > 70 and n <= 80:
         country = 'AU'
     elif n > 80 and n <= 90:
-        n = random.randint(1,4)
+        n = random.randint(1, 4)
         if n is 1:
             country = 'BR'
         elif n is 2:
@@ -104,12 +107,13 @@ def random_weighted_country():
         elif n is 4:
             country = 'CN'
     else:
-        country = "".join(random.sample(countries.keys(),1))
+        country = "".join(random.sample(countries.keys(), 1))
     return country
+
 
 def random_weighted_currency():
     # choose currency by share of world trade
-    n = random.randint(1,100)
+    n = random.randint(1, 100)
     if n <= 27:
         currency = 'EUR'
     elif n > 27 and n <= 42:
@@ -141,12 +145,13 @@ def random_weighted_currency():
     elif n is 87:
         currency = 'NOK'
     else:
-        currency = "".join(random.sample(currencies.keys(),1))
+        currency = "".join(random.sample(currencies.keys(), 1))
 
     if (currency not in accepted_currencies):
         return random_weighted_currency()
 
     return currency
+
 
 def str_time_prop(start, end, format, prop):
     stime = time.mktime(time.strptime(start, format))
@@ -165,21 +170,22 @@ def random_date(start=None, end=None, prop=None, format='%d-%b-%y %H:%M:%S'):
     if prop is None:
         prop = random.random()
     d = str_time_prop(start, end, format, prop).upper()
-    if random.randint(1,10) <= 7:
+    if random.randint(1, 10) <= 7:
         min = 8
         max = 18
     else:
         min = 0
         max = 23
-    d = "".join([d[0:10],"{hour:02d}:{min:02d}:{sec:02d}".format(
-            hour=random.randint(min,max),
-            min=random.randint(0,59),
-            sec=random.randint(0,59)
-        )])
+    d = "".join([d[0:10], "{hour:02d}:{min:02d}:{sec:02d}".format(
+        hour=random.randint(min, max),
+        min=random.randint(0, 59),
+        sec=random.randint(0, 59)
+    )])
     return d
 
+
 def random_weighted_date():
-    n = random.randint(0,100)
+    n = random.randint(0, 100)
     if n <= 25:
         dateFrom = "01-JAN-15 00:00:00"
         dateTo = None
@@ -198,39 +204,42 @@ def random_weighted_date():
     elif n > 95:
         dateFrom = "01-MAY-10 00:00:00"
         dateTo = "01-JAN-11 00:00:00"
-    return random_date(dateFrom,dateTo)
+    return random_date(dateFrom, dateTo)
+
 
 def random_amount():
-    n = random.randint(0,10000)
+    n = random.randint(0, 10000)
     x = 0
     y = 0
     if n <= 5000:
-        x = random.randint(1,3) * 500
+        x = random.randint(1, 3) * 500
     elif n > 5000 and n <= 6500:
-        x = random.randint(1,5) * 1000
+        x = random.randint(1, 5) * 1000
     elif n > 6500 and n <= 8000:
-        x = random.randint(1,2) * 5000
+        x = random.randint(1, 2) * 5000
     elif n > 8000 and n <= 8500:
-        x = random.randint(1,3) * 250
+        x = random.randint(1, 3) * 250
     elif n > 8500 and n <= 9950:
-        x = random.randint(1,3) * 500
+        x = random.randint(1, 3) * 500
     elif n > 9950 and n <= 9990:
-        x = random.randint(1,5) * 5000
+        x = random.randint(1, 5) * 5000
     elif n > 9990 and n <= 9995:
-        x = random.randint(1,5) * 50000
+        x = random.randint(1, 5) * 50000
     elif n > 9995 and n <= 9999:
-        x = random.randint(1,5) * 100000
+        x = random.randint(1, 5) * 100000
     elif n > 9999 and n <= 10000:
-        x = random.randint(1,5) * 1000000
-    return round(abs(random.gauss(x,x/5)))
+        x = random.randint(1, 5) * 1000000
+    return round(abs(random.gauss(x, x / 5)))
 
-def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=False):
+
+def generate_trade(dateFrom=None, dateTo=None, live=False, today=False,
+                   return_json=False):
     trade = dict()
     trade['userId'] = get_weighted_userid()
 
     if live is True or today is True:
         t = time.gmtime()
-        format='%d-%b-%y %H:%M:%S'
+        format = '%d-%b-%y %H:%M:%S'
         dateFrom = time.strftime(format, t)
         if live is True:
             timePlaced = dateFrom
@@ -241,7 +250,7 @@ def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=
         if dateFrom is None and dateTo is None:
             timePlaced = random_weighted_date()
         else:
-            timePlaced = random_date(dateFrom,dateTo)
+            timePlaced = random_date(dateFrom, dateTo)
 
     trade['timePlaced'] = timePlaced
     year_rates = rates['20' + trade['timePlaced'][7:9]]['rates']
@@ -253,7 +262,7 @@ def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=
         country = countries[originatingCountry]
 
         # lets assume 10% of transfers are in a currency different from that of originatingCountry
-        if random.randint(1,10) > 1:
+        if random.randint(1, 10) > 1:
             # some countries have 0 or more than 1 currency
             ccurrencies = country['currencies']
             x = len(ccurrencies)
@@ -262,7 +271,7 @@ def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=
             if x is 1:
                 currencyFrom = ccurrencies[0]
             elif x > 1:
-                currencyFrom = "".join(random.sample(accepted_currencies,1))
+                currencyFrom = "".join(random.sample(accepted_currencies, 1))
         else:
             currencyFrom = random_weighted_currency()
 
@@ -279,24 +288,50 @@ def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=
         if currencyFrom == 'EUR':
             eurAmount = amountSell
             rate = year_rates[currencyTo]
-            rate = abs(random.gauss(rate,0.02))
+            rate = abs(random.gauss(rate, 0.02))
             amountBuy = eurAmount * rate
         else:
             eurAmount = amountSell / year_rates[currencyFrom]
             amountBuy = eurAmount * year_rates[currencyTo]
             rate = amountBuy / eurAmount
-            rate = abs(random.gauss(rate,0.02))
+            rate = abs(random.gauss(rate, 0.02))
     except Exception:
-        return generate_trade(dateFrom=dateFrom,dateTo=dateTo,live=live,today=today,return_json=return_json)
+        return generate_trade(dateFrom=dateFrom, dateTo=dateTo, live=live,
+                              today=today, return_json=return_json)
 
-    trade['rate'] = round(rate,5)
-    trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
-    trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
-    trade['amountBuyEur'] = float(round(eurAmount, currencies[currencyTo]['decimals']))
+    trade['rate'] = round(rate, 5)
+    trade['amountSell'] = float(
+        round(amountSell, currencies[currencyFrom]['decimals']))
+    trade['amountBuy'] = float(
+        round(amountBuy, currencies[currencyTo]['decimals']))
+    trade['amountBuyEur'] = float(
+        round(eurAmount, currencies[currencyTo]['decimals']))
 
     if return_json is True:
         return json.dumps(trade, indent=4, sort_keys=True)
     return trade
+
+
+def generate_trades_to_sum(max=50000000, dateFrom=None, dateTo=None,
+                           today=False, live=False, return_json=True):
+    trades = list()
+    total = 0
+    i = 0
+    max = abs(random.gauss(max, max / 4.5))
+
+    while total < max:
+        trade = generate_trade(dateFrom=dateFrom, dateTo=dateTo, live=live,
+                               today=today)
+        total = total + trade['amountBuyEur']
+        del trade['amountBuyEur']
+        i = i + 1
+        trades.append(trade)
+
+    if return_json is True:
+        return json.dumps(trades, indent=4, sort_keys=True)
+    else:
+        return trades
+
 
 def setup_global_data():
     global countries, currencies, languages, regions, eurozone, rates, accepted_currencies
@@ -308,26 +343,10 @@ def setup_global_data():
     rates = get_rates()
     accepted_currencies = list(rates['2015']['rates'].keys())
 
-def generate_trades_to_sum(max=50000000,dateFrom=None,dateTo=None,today=False,live=False,return_json=True):
-    trades = list()
-    total = 0
-    i = 0
-    max = abs(random.gauss(max,max/4.5))
 
-    while total < max:
-        trade = generate_trade(dateFrom=dateFrom,dateTo=dateTo,live=live,today=today)
-        total = total + trade['amountBuyEur']
-        del trade['amountBuyEur']
-        i = i + 1
-        trades.append(trade)
-
-    if return_json is True:
-        return json.dumps(trades, indent=4, sort_keys=True)
-    else:
-        return trades
+setup_global_data()
 
 if __name__ in '__main__':
-    setup_global_data()
-#    trades = generate_trades_to_sum(10000000,live=False,today=True)
-#    print(trades)
-    print(generate_trade(return_json=True,live=True))
+    # trades = generate_trades_to_sum(10000000,live=False,today=True)
+    #    print(trades)
+    print(generate_trade(return_json=True, live=True))
