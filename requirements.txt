@@ -1,3 +1,4 @@
 future
 distribute
 nose
+click

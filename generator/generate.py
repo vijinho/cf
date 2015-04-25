@@ -6,6 +6,7 @@ import codecs
 import json
 import random
 import time
+import click
 
 from builtins import *
 
@@ -206,7 +207,7 @@ def random_date(start=None, end=None, prop=None, ts_format='%d-%b-%y %H:%M:%S'):
         end = time.strftime(ts_format, t)
     if prop is None:
         prop = random.random()
-    d = str_time_prop(start, end, ts_format, prop).upper()
+    d = str_time_prop(start, end, ts_format, prop)
     if random.randint(1, 10) <= 7:
         min_hr = 8
         max_hr = 18
@@ -218,7 +219,7 @@ def random_date(start=None, end=None, prop=None, ts_format='%d-%b-%y %H:%M:%S'):
         min=random.randint(0, 59),
         sec=random.randint(0, 59)
     )])
-    return d
+    return d.upper()
 
 
 def random_weighted_date():
@@ -304,7 +305,7 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
         else:
             time_placed = random_date(date_from, date_to)
 
-    trade['timePlaced'] = time_placed
+    trade['timePlaced'] = time_placed.upper()
     year_rates = rates['20' + trade['timePlaced'][7:9]]['rates']
 
     currency_to = False
@@ -418,11 +419,36 @@ def setup_global_data():
     rates = get_rates()
     accepted_currencies = list(rates['2015']['rates'].keys())
 
-
 setup_global_data()
 
-if __name__ in '__main__':
-#    pass
-    trades = generate_trades_to_sum(10000000, live=False, today=False)
-    print(trades)
+@click.command()
+@click.option('--live', is_flag=True, default=False, help="Simulate a live trade?")
+@click.option('--today', is_flag=True, default=False, help="Simulate a trade made today?")
+@click.option('--historic', is_flag=True, default=False, help="Simulate historic data?")
+@click.option('--quantity', default=1, help="Exact number of trades to generate?")
+@click.option('--amount', default=0, help="Generate a random number of trades totalling APPROX this amount equivalent in EUR")
+def generate(live,today,historic,quantity,amount):
+    if today is True:
+        historic = False
+    if live is True:
+        historic = False
+        today = False
+    if historic is True:
+        today = False
+        live = False
+
+    if amount == 0:
+        trades_list = list()
+        for i in range(0,quantity):
+            trade = generate_trade(return_json=True,live=live,today=today)
+            trades_list.append(trade)
+        print(json.dumps(trades_list, indent=4, sort_keys=True))
+    else:
+        print(generate_trades_to_sum(return_json=True,live=live,today=today,max_sum=amount))
+
+if __name__ == '__main__':
+    generate()
+    #    pass
+#    trades = generate_trades_to_sum(10000000, live=False, today=False)
+#    print(trades)
 #    print(generate_trade(return_json=True, live=True))

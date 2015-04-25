@@ -34,6 +34,25 @@ Based on the example:
 }
 </pre>
 
+#####Usage
+<pre>
+> python generator/generate.py --help
+Usage: generate.py [OPTIONS]
+
+Options:
+  --live              Simulate a live trade?
+  --today             Simulate a trade made today?
+  --historic          Simulate historic data?
+  --quantity INTEGER  How many trades to generate?
+  --amount INTEGER    Generate a random number of trades totalling this amount
+                      equivalent in EUR
+  --help              Show this message and exit.
+</pre>
+######Examples
+- `python generator/generate.py --live --quantity=10` - generate 10 trades timestamped NOW
+- `python generator/generate.py --today --amount=100000` - generate trades totalling around €100000 in value for today with random times
+- `python generator/generate.py --historic --quantity=5` - generate 5 random historic trades
+
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
 
@@ -47,10 +66,6 @@ I wanted to make as realistic a simulator to real data as possible so I tried to
 - **amountBuyEur** temporary extra field - the amount bought valued in EUROs for calculating totals for a time period
 
 Data: I created [ISO Country Data](https://github.com/vijinho/ISO-Country-Data) as a spin-off from this project.
-
-#####generator/generate.py
-* Python3-compatible - aided by [Python Future](http://python-future.org/quickstart.html#installation) and [2to3](https://docs.python.org/2/library/2to3.html)
-
 
 My random thinking into the generator:
 
@@ -66,7 +81,8 @@ My random thinking into the generator:
 - 2008-11 The geographical distribution of trade finance (SWIFT transfers), trade credit insurance and trade  (approx) % Asia-Pacific (55), Europe (25), Middle-East (8), Africa (5), North America (5), Latin America (2)
  - Use [fixer.io historical rates but limit per year](http://fixer.io/) 
  - Only use currencies which we have rates for
- 
+ - Python3-compatible - aided by [Python Future](http://python-future.org/quickstart.html#installation) and [2to3](https://docs.python.org/2/library/2to3.html)
+
 **Sources**
 
 - [Highest Trading Currencies and Countries %](http://www.mapsofworld.com/world-top-ten/world-map-richest-countries-currency.html)
