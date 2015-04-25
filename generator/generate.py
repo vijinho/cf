@@ -228,9 +228,9 @@ def generate_trade(dateFrom=None,dateTo=None):
         timePlaced = random_weighted_date()
     else:
         timePlaced = random_date(dateFrom,dateTo)
+
     trade['timePlaced'] = timePlaced
-    y = trade['timePlaced'][:6:9]
-    print y
+    year_rates = rates['20' + trade['timePlaced'][5:7]]['rates']
 
     currencyTo = False
     currencyFrom = False
@@ -261,8 +261,17 @@ def generate_trade(dateFrom=None,dateTo=None):
     trade['currencyTo'] = currencyTo
 
     amountSell = random_amount()
+    if currencyFrom is 'EUR':
+        eurAmount = amountSell
+    else:
+        eurAmount = amountSell / year_rates[currencyFrom]
 
+    amountBuy = eurAmount * year_rates[currencyTo]
+    rate = amountBuy / eurAmount
+
+    trade['rate'] = rate
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
+    trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
 
     return trade
 
