@@ -50,9 +50,9 @@ Options:
                           00:00:00"
   -e, --dateend TEXT      Enter date range end: format "01-JAN-2015 00:00:00"
   -c, --csv               Output CSV instead of JSON?
+  -f, --outfile TEXT      Filename to output results.
   -v, --verbose
   --help                  Show this message and exit.
-  --help              Show this message and exit.
 </pre>
 ######Examples
 - `python generator/generate.py --live --quantity=10` - generate 10 trades timestamped NOW
@@ -62,6 +62,8 @@ Options:
 - `python generator/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` - generate 10 historic trades between the date range 12-25 December 2012
  
 - `python generator/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` - generate trades totally 500,000 for the date 6 May 2013
+
+- `python generator/generate.py --quantity=5 --outfile=test.json` - write 5 random historic trades to the file test.json
   
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
