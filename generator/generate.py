@@ -8,7 +8,7 @@ import codecs
 import json
 import random
 import time
-import functools
+import collections
 
 from builtins import *
 
@@ -156,7 +156,7 @@ def str_time_prop(start, end, format, prop):
     return time.strftime(format, time.localtime(ptime))
 
 
-def random_date(start=None, end=None, prop=None, format='%d%b%y %H:%M:%S'):
+def random_date(start=None, end=None, prop=None, format='%d-%b-%y %H:%M:%S'):
     if start is None:
         t = time.gmtime()
         start = time.strftime(format, t)
@@ -170,23 +170,23 @@ def random_date(start=None, end=None, prop=None, format='%d%b%y %H:%M:%S'):
 def random_weighted_date():
     n = random.randint(0,100)
     if n <= 25:
-        dateFrom = "01JAN15 00:00:00"
+        dateFrom = "01-JAN-15 00:00:00"
         dateTo = None
     elif n > 25 and n <= 45:
-        dateFrom = "01JAN14 00:00:00"
-        dateTo = "01JAN15 00:00:00"
+        dateFrom = "01-JAN-14 00:00:00"
+        dateTo = "01-JAN-15 00:00:00"
     elif n > 45 and n <= 63:
-        dateFrom = "01JAN13 00:00:00"
-        dateTo = "01JAN14 00:00:00"
+        dateFrom = "01-JAN-13 00:00:00"
+        dateTo = "01-JAN-14 00:00:00"
     elif n > 63 and n <= 85:
-        dateFrom = "01JAN12 00:00:00"
-        dateTo = "01JAN13 00:00:00"
+        dateFrom = "01-JAN-12 00:00:00"
+        dateTo = "01-JAN-13 00:00:00"
     elif n > 85 and n <= 95:
-        dateFrom = "01JAN11 00:00:00"
-        dateTo = "01JAN12 00:00:00"
+        dateFrom = "01-JAN-11 00:00:00"
+        dateTo = "01-JAN-12 00:00:00"
     elif n > 95:
-        dateFrom = "01MAY10 00:00:00"
-        dateTo = "01JAN11 00:00:00"
+        dateFrom = "01-MAY-10 00:00:00"
+        dateTo = "01-JAN-11 00:00:00"
     return random_date(dateFrom,dateTo)
 
 def random_amount():
@@ -230,7 +230,7 @@ def generate_trade(dateFrom=None,dateTo=None):
         timePlaced = random_date(dateFrom,dateTo)
 
     trade['timePlaced'] = timePlaced
-    year_rates = rates['20' + trade['timePlaced'][5:7]]['rates']
+    year_rates = rates['20' + trade['timePlaced'][7:9]]['rates']
 
     currencyTo = False
     currencyFrom = False
@@ -276,6 +276,8 @@ def generate_trade(dateFrom=None,dateTo=None):
     trade['rate'] = round(rate,5)
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
     trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
+
+#    trade = collections.OrderedDict(sorted(trade.items()))
     return trade
 
 def setup_global_data():
@@ -290,9 +292,10 @@ def setup_global_data():
 
 if __name__ in '__main__':
     setup_global_data()
-    print('[')
-    for x in range(1000):
+
+    trades = list()
+    for x in range(5):
         trade = generate_trade()
-        print(json.dumps(trade))
-        print(',')
-    print(']')
+        trades.append(trade)
+
+    print(json.dumps(trades, indent=4, sort_keys=True))
