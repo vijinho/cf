@@ -430,8 +430,9 @@ setup_global_data()
 @click.option('--datestart', '-s', default=None, help='Enter date range start: format "01-JAN-2015 00:00:00"')
 @click.option('--dateend', '-e', default=None, help='Enter date range end: format "01-JAN-2015 00:00:00"')
 @click.option('--csv', '-c', is_flag=True, default=False, help="Output CSV instead of JSON?")
+@click.option('--outfile', '-f', default=None, help='Filename to output results.')
 @click.option('-v', '--verbose', count=True)
-def generate(live,today,historic,quantity,amount,datestart,dateend,csv,verbose):
+def generate(live,today,historic,quantity,amount,datestart,dateend,csv,outfile,verbose):
     if today is True:
         historic = False
     if live is True:
@@ -446,9 +447,15 @@ def generate(live,today,historic,quantity,amount,datestart,dateend,csv,verbose):
         for i in range(0,quantity):
             trade = generate_trade(return_json=True,live=live,today=today,date_from=datestart,date_to=dateend)
             trades_list.append(trade)
-        print(json.dumps(trades_list, indent=4, sort_keys=True))
+        data = json.dumps(trades_list, indent=4, sort_keys=True)
     else:
-        print(generate_trades_to_sum(return_json=True,live=live,today=today,max_sum=amount,date_from=datestart,date_to=dateend))
+        data = generate_trades_to_sum(return_json=True,live=live,today=today,max_sum=amount,date_from=datestart,date_to=dateend)
+
+    if outfile:
+        with open(outfile, 'wb') as fh:
+            fh.write(str(data).encode('utf8'))
+    else:
+        print(data)
 
 if __name__ == '__main__':
     generate()
