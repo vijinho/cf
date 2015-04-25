@@ -6,6 +6,8 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import codecs
 import json
+import random
+import time
 
 from builtins import *
 
@@ -57,6 +59,178 @@ def setup_global_data():
     regions = get_regions()
     eurozone = regions['eurozone']
 
+def get_weighted_userid():
+    x = 0
+    n = random.randint(1,6)
+    if n is 1:
+        x = random.randint(1,3000)
+    elif n is 2:
+        x = random.randint(1,8000)
+    elif n is 3:
+        x = random.randint(1,17000)
+    elif n is 4:
+        x = random.randint(1,33000)
+    elif n is 5:
+        x = random.randint(1,48000)
+    elif n is 6:
+        x = random.randint(1,65000)
+    return x
+
+def random_weighted_country():
+    n = random.randint(1,100)
+    if n < 50:
+        currency = 'EUR'
+        # weigh the EURO country
+        n = random.randint(1,100)
+        if n <= 20:
+            country = 'DE'
+        elif n > 20 and n <= 45:
+            country = 'FR'
+        elif n > 45 and n <= 65:
+            country = 'IT'
+        elif n > 65 and n <= 80:
+            country = 'ES'
+        elif n > 80 and n < 85:
+            country = 'NL'
+        else:
+            country = "".join(random.sample(regions['eurozone'],1))
+    elif n > 50 and n <= 70:
+        country = 'US'
+    elif n > 70 and n <= 80:
+        country = 'AU'
+    elif n > 80 and n <= 90:
+        n = random.randint(1,4)
+        if n is 1:
+            country = 'BR'
+        elif n is 2:
+            country = 'RU'
+        elif n is 3:
+            country = 'IN'
+        elif n is 4:
+            country = 'CN'
+    else:
+        country = "".join(random.sample(countries.keys(),1))
+    return country
+
+def random_weighted_currency():
+    # choose currency by share of world trade
+    n = random.randint(1,100)
+    if n <= 27:
+        currency = 'EUR'
+    elif n > 27 and n <= 42:
+        currency = 'USD'
+    elif n > 42 and n <= 47:
+        currency = 'JPY'
+    elif n > 47 and n <= 51:
+        currency = 'GBP'
+    elif n > 51 and n <= 63:
+        currency = 'CNY'
+    elif n > 63 and n <= 65:
+        currency = 'RUB'
+    elif n > 65 and n <= 68:
+        currency = 'MXN'
+    elif n > 68 and n <= 71:
+        currency = 'HKD'
+    elif n > 71 and n <= 74:
+        currency = 'CAD'
+    elif n > 75 and n <= 77:
+        currency = 'SGD'
+    elif n > 78 and n <= 83:
+        currency = 'AUD'
+    elif n is 84:
+        currency = 'SEK'
+    elif n is 85:
+        currency = 'CHF'
+    elif n is 86:
+        currency = 'THB'
+    elif n is 87:
+        currency = 'NOK'
+    else:
+        currency = "".join(random.sample(currencies.keys(),1))
+    return currency
+
+def str_time_prop(start, end, format, prop):
+    stime = time.mktime(time.strptime(start, format))
+    etime = time.mktime(time.strptime(end, format))
+    ptime = stime + prop * (etime - stime)
+    return time.strftime(format, time.localtime(ptime))
+
+
+def random_date(start=None, end=None, prop=None, format='%d%b%y %H:%M:%S'):
+    if start is None:
+        t = time.gmtime()
+        start = time.strftime(format, t)
+    if end is None:
+        t = time.gmtime()
+        end = time.strftime(format, t)
+    if prop is None:
+        prop = random.random()
+    return str_time_prop(start, end, format, prop).upper()
+
+def random_weighted_date():
+    n = random.randint(0,100)
+    if n <= 25:
+        dateFrom = "01JAN15 00:00:00"
+        dateTo = None
+    elif n > 25 and n <= 45:
+        dateFrom = "01JAN14 00:00:00"
+        dateTo = "01JAN15 00:00:00"
+    elif n > 45 and n <= 63:
+        dateFrom = "01JAN13 00:00:00"
+        dateTo = "01JAN14 00:00:00"
+    elif n > 63 and n <= 85:
+        dateFrom = "01JAN12 00:00:00"
+        dateTo = "01JAN13 00:00:00"
+    elif n > 85 and n <= 95:
+        dateFrom = "01JAN11 00:00:00"
+        dateTo = "01JAN12 00:00:00"
+    elif n > 95:
+        dateFrom = "01MAY10 00:00:00"
+        dateTo = "01JAN11 00:00:00"
+    return random_date(dateFrom,dateTo)
+
+def generate_trade(dateFrom=None,dateTo=None):
+    trade = dict()
+    trade['userId'] = get_weighted_userid()
+
+    # weight the date
+    if dateFrom is None and dateTo is None:
+        timePlaced = random_weighted_date()
+    else:
+        timePlaced = random_date(dateFrom,dateTo)
+    trade['timePlaced'] = timePlaced
+
+    currencyTo = False
+    currencyFrom = False
+    while currencyFrom is False or currencyFrom is currencyTo:
+        originatingCountry = random_weighted_country()
+        country = countries[originatingCountry]
+
+        # lets assume 10% of transfers are in a currency different from that of originatingCountry
+        if random.randint(1,10) > 1:
+            # some countries have 0 or more than 1 currency
+            ccurrencies = country['currencies']
+            x = len(ccurrencies)
+            if x is 0:
+                currencyFrom = False
+            if x is 1:
+                currencyFrom = ccurrencies[0]
+            elif x > 1:
+                currencyFrom = "".join(random.sample(ccurrencies,1))
+        else:
+            currencyFrom = random_weighted_currency()
+
+    trade['originatingCountry'] = originatingCountry
+    trade['currencyFrom'] = currencyFrom
+    currencyTo = currencyFrom
+    while currencyTo is currencyFrom:
+        currencyTo = random_weighted_currency()
+    trade['currencyTo'] = currencyTo
+
+#    print(currencies[currencyTo])
+    return trade
+
 if __name__ in '__main__':
     setup_global_data()
-    print(countries['ES'])
+    print(generate_trade())
+    print(len(regions['eurozone']))

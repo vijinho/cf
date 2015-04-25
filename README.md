@@ -35,15 +35,15 @@ Based on the example:
 </pre>
 
 #####Random Data Simulator and Validator Rules
-I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help.
+I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
 
-- **userId**: Randomize between 1 and 60,000
+- **userId**: Randomize between 1 and 65,000
 - **currencyFrom/To**: Get list from (20 currencies supported, 17 from, 20 to, 30 in 2015)
 - **amountSell**: Randomize between 15 and 50,000,000
 - **amountBuy**: (amountSell * rate) 
 - **rate**: (is currencyFrom into currencyTo)
 - **timePlaced**: (DDmonYY HH:MM:SS) Any date since May 2010
-- **originating country**: (from currencyFrom user)
+- **originatingCountry**: (from currencyFrom user)
 
 **Note** simulator won't be using historical rates.
 
@@ -57,14 +57,15 @@ Data: I created [ISO Country Data](https://github.com/vijinho/ISO-Country-Data) 
 My random thinking into the generator:
 
 - CF: 600,000,000, 30,000 customers by Nov 2011
-- CF: 5m euros/day average (add 1m for each year from 2010)
+- CF: 5m euros/day average (add 1m for each year from May 2010)
 - CF: 1.8 billion so far
 - Int transfers: Median €5000, Average €400,000
 - EU transfers: 89m x €6827, 64m x 1138, 2009, UK 34.6m x £2598
 - Size of transfer like Pareto's 80/20 rule - 70/30
 - Size of payments: Benford's Law - 30% of all payments the first digit of the amount is a 1, while it is a 9 for only 5% of payments
 - 2008-11 The geographical distribution of trade finance (SWIFT transfers), trade credit insurance and trade  (approx) % Asia-Pacific (55), Europe (25), Middle-East (8), Africa (5), North America (5), Latin America (2)
-
+- Do not bother with historical rates
+ 
 **Sources**
 
 - [Highest Trading Currencies and Countries %](http://www.mapsofworld.com/world-top-ten/world-map-richest-countries-currency.html)
@@ -76,7 +77,9 @@ THE STATISTICS OF PAYMENTS](http://swiftinstitute.org/wp-content/uploads/2012/10
 Customer Preferences and
 Opportunities for Financial Institutions](https://www.frbservices.org/files/communications/pdf/research/wire_transfer_research_final.pdf)
 - [Trade finance: developments and issues](http://www.bis.org/publ/cgfs50.pdf)
-
+- [USE OF CURRENCIES IN INTERNATIONAL TRADE: ANY CHANGES IN THE
+PICTURE?](https://www.wto.org/english/res_e/reser_e/ersd201210_e.pdf)
+ 
 US Fed data on companies:
 <pre>
 Annual Wires Sent/Received
