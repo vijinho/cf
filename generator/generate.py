@@ -229,6 +229,8 @@ def generate_trade(dateFrom=None,dateTo=None):
     else:
         timePlaced = random_date(dateFrom,dateTo)
     trade['timePlaced'] = timePlaced
+    y = trade['timePlaced'][:6:9]
+    print y
 
     currencyTo = False
     currencyFrom = False
