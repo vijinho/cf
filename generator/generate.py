@@ -422,7 +422,7 @@ def setup_global_data():
 setup_global_data()
 
 if __name__ in '__main__':
-    pass
-#    trades = generate_trades_to_sum(10000000, live=False, today=False)
-#    print(trades)
+#    pass
+    trades = generate_trades_to_sum(10000000, live=False, today=False)
+    print(trades)
 #    print(generate_trade(return_json=True, live=True))
