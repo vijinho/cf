@@ -8,7 +8,6 @@ import codecs
 import json
 import random
 import time
-import collections
 
 from builtins import *
 
@@ -225,7 +224,7 @@ def random_amount():
         x = random.randint(1,5) * 1000000
     return round(abs(random.gauss(x,x/5)))
 
-def generate_trade(dateFrom=None,dateTo=None,live=False,today=False):
+def generate_trade(dateFrom=None,dateTo=None,live=False,today=False,return_json=False):
     trade = dict()
     trade['userId'] = get_weighted_userid()
 
@@ -288,14 +287,15 @@ def generate_trade(dateFrom=None,dateTo=None,live=False,today=False):
             rate = amountBuy / eurAmount
             rate = abs(random.gauss(rate,0.02))
     except Exception:
-        return generate_trade(dateFrom,dateTo)
+        return generate_trade(dateFrom=dateFrom,dateTo=dateTo,live=live,today=today,return_json=return_json)
 
     trade['rate'] = round(rate,5)
     trade['amountSell'] = float(round(amountSell, currencies[currencyFrom]['decimals']))
     trade['amountBuy'] = float(round(amountBuy, currencies[currencyTo]['decimals']))
     trade['amountBuyEur'] = float(round(eurAmount, currencies[currencyTo]['decimals']))
 
-#    trade = collections.OrderedDict(sorted(trade.items()))
+    if return_json is True:
+        return json.dumps(trade, indent=4, sort_keys=True)
     return trade
 
 def setup_global_data():
@@ -330,3 +330,4 @@ if __name__ in '__main__':
     setup_global_data()
     trades = generate_trades_to_sum(10000000,live=False,today=True)
     print(trades)
+    print(generate_trade(return_json=True,live=True))
