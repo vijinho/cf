@@ -1,11 +1,15 @@
 #CF Engineering Challenge
 
 #OS X Installation
-- Task Queue: [Celery](http://www.celeryproject.org/) - `sudo easy_install Celery`
-- Message Queueing: [RabbitMQ](https://www.rabbitmq.com/) - `brew install rabbitmq`
-- Database: [brew](http://brew.sh/) - `brew install rethinkdb`
+
+- `pip install -r requirements.txt`
+- RethinkDB: [brew](http://brew.sh/) - `brew install rethinkdb`
+- Nginx: (How to setup an nginx SSL-forwarding proxy)[https://gist.github.com/vijinho/2a59d7660ecc0c7d8c2b]
+- TBD Task Queue: [Celery](http://www.celeryproject.org/) - `sudo easy_install Celery`
+- TBD Message Queueing: [RabbitMQ](https://www.rabbitmq.com/) - `brew install rabbitmq`
 
 ##RethinkDB Setup
+
 1. `rethinkdb create`
 2. `rethinkdb serve`
 3. [http://localhost:8080](http://localhost:8080)
@@ -23,13 +27,28 @@
 
 ##Message Consumer
 
-1. `cd consumer && gunicorn consume:app` OR `bin/startconsumer.sh`
+Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy.
 
-###Installation
+**Starting**: `bin/startconsumer.sh` or `cd consumer && gunicorn consume:app`
 
- 
+###Why Falcon?
+- Falcon is a very fast, minimalist Python framework for building cloud APIs and app backends.
+- Falcon encourages the REST architectural style
+- Performance. Unlike other Python web frameworks, Falcon won't bottleneck your API's performance under highly concurrent workloads. 
+- Freedom. Falcon isn't very opinionated. In other words, the framework leaves a lot of decisions and implementation details to you, the API developer
+- Reliable - 100% code coverage.
+
+###Why Gunicorn?
+It's a pre-fork worker model ported from Ruby's Unicorn project. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resources, and fairly speedy.
+
+###Why Nginx?
+[How to deploy Nginx/Python apps](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx)
+Nginx is known for its high performance, stability, rich feature set, simple configuration, and low resource consumption and is one of a handful of servers written to address the [C10K problem](http://www.kegel.com/c10k.html)
+
 ###Testing/Data
+
 ####Message Generator
+
 Based on the example:
 <pre>
 {
@@ -64,16 +83,14 @@ Options:
   -v, --verbose
   --help                  Show this message and exit.
 </pre>
+
 ######Examples
-- `python generator/generate.py --live --quantity=10` - generate 10 trades timestamped NOW
-- `python generator/generate.py --today --amount=100000` - generate trades totalling around €100000 in value for today with random times
-- `python generator/generate.py --historic --quantity=5` - generate 5 random historic trades
-
-- `python generator/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` - generate 10 historic trades between the date range 12-25 December 2012
- 
-- `python generator/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` - generate trades totally 500,000 for the date 6 May 2013
-
-- `python generator/generate.py --quantity=5 --outfile=test.json` - write 5 random historic trades to the file test.json
+- `python generator/generate.py --live --quantity=10` generate 10 trades timestamped NOW
+- `python generator/generate.py --today --amount=100000` generate trades totalling around €100000 in value for today with random times
+- `python generator/generate.py --historic --quantity=5` generate 5 random historic trades
+- `python generator/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` generate 10 historic trades between the date range 12-25 December 2012
+- `python generator/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` generate trades totally 500,000 for the date 6 May 2013
+- `python generator/generate.py --quantity=5 --outfile=test.json`  write 5 random historic trades to the file test.json
   
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
@@ -101,9 +118,9 @@ My random thinking into the generator:
 - Size of transfer like Pareto's 80/20 rule - 70/30
 - Size of payments: Benford's Law - 30% of all payments the first digit of the amount is a 1, while it is a 9 for only 5% of payments
 - 2008-11 The geographical distribution of trade finance (SWIFT transfers), trade credit insurance and trade  (approx) % Asia-Pacific (55), Europe (25), Middle-East (8), Africa (5), North America (5), Latin America (2)
- - Use [fixer.io historical rates but limit per year](http://fixer.io/) 
- - Only use currencies which we have rates for
- - Python3-compatible - aided by [Python Future](http://python-future.org/quickstart.html#installation) and [2to3](https://docs.python.org/2/library/2to3.html)
+- Use [fixer.io historical rates but limit per year](http://fixer.io/) 
+- Only use currencies which we have rates for
+- Python3-compatible - aided by [Python Future](http://python-future.org/quickstart.html#installation) and [2to3](https://docs.python.org/2/library/2to3.html)
 
 **Sources**
 
@@ -131,7 +148,20 @@ Annual Wires Sent/Received
 </pre>
 
 ##Message Processor
-HHVM
+
 
 
 ##Frontend
+
+
+#Notes
+##Ports
+
+* **RethinkDB**
+  * Listening for intracluster connections on port 29015
+  * Listening for client driver connections on port 28015
+  *Listening for administrative HTTP connections on port 8080
+* **gunicorn**
+  * Listening at: http://127.0.0.1:8000
+* **nginx**
+  * Listening 80
