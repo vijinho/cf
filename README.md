@@ -23,7 +23,13 @@
 
 ##Message Consumer
 
-###Testing
+1. `cd consumer`
+2. `gunicorn consume:app`
+
+###Installation
+
+ 
+###Testing/Data
 ####Message Generator
 Based on the example:
 <pre>
