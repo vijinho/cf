@@ -13,6 +13,7 @@
 5. Generate random data: `python generator/generate.py -h -q 100000 -f data/random.json` - 100k documents
 6. Import data: `rethinkdb import --force --format json -f random.json --table cf.trades`
 7. In Data Explorer: `r.db('cf').table('trades').count()`
+8. Test Python script: `python bin/rethink_test.py` which runs the same query
  
 [RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
 
