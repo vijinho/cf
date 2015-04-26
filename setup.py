@@ -10,7 +10,7 @@ config = {
     'download_url': 'https://github.com/vijinho/cfchallenge',
     'author_email': 'vijay.mahrra@gmail.com',
     'version': '1.0',
-    'install_requires': ['nose','future', 'click'],
+    'install_requires': ['nose','future', 'click', 'rethinkdb'],
     'packages': ['generator'],
     'scripts': [],
     'name': 'cfchallenge'

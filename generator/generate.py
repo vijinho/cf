@@ -445,7 +445,7 @@ def generate(live,today,historic,quantity,amount,datestart,dateend,csv,outfile,v
     if amount == 0:
         trades_list = list()
         for i in range(0,quantity):
-            trade = generate_trade(return_json=True,live=live,today=today,date_from=datestart,date_to=dateend)
+            trade = generate_trade(return_json=False,live=live,today=today,date_from=datestart,date_to=dateend)
             trades_list.append(trade)
         data = json.dumps(trades_list, indent=4, sort_keys=True)
     else:

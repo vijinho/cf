@@ -9,7 +9,11 @@
 1. `rethinkdb create`
 2. `rethinkdb serve`
 3. [http://localhost:8080](http://localhost:8080)
-
+4. Create database **cf**, table **trades**
+5. Generate random data: `python generator/generate.py -h -q 1000000 -f data/random.json` - 1 million documents
+6. Import data: `rethinkdb import --force --format json -f random.json --table cf.trades`
+7. In Data Explorer: `r.db('cf').table('trades').count()`
+ 
 [RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
 
 * Has a web interface to see realtime statistics on what’s going on. 
