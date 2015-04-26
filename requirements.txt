@@ -3,3 +3,5 @@ distribute
 nose
 click
 rethinkdb
+cython
+falcon
