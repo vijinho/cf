@@ -23,8 +23,7 @@
 
 ##Message Consumer
 
-1. `cd consumer`
-2. `gunicorn consume:app`
+1. `cd consumer && gunicorn consume:app` OR `bin/startconsumer.sh`
 
 ###Installation
 

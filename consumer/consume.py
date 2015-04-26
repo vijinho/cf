@@ -6,6 +6,7 @@ Consume POSTed messages for trades
 from builtins import *
 
 import falcon
+import rethinkdb as r
 
 __author__ = "Vijay Mahrra"
 __copyright__ = "Copyright 2015, Vijay Mahrra"
@@ -19,10 +20,9 @@ __status__ = "Development"
 class ConsumeResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
-        resp.body = ("\nI've always been more interested in\n"
-                     'the future than in the past.\n'
-                     '\n'
-                     '    ~ Grace Hopper\n\n')
+        r.connect('localhost', 28015).repl()
+        data = r.db('cf').table('trades').count().run()
+        resp.body = (str(data))
 
 app = falcon.API()
 trade = ConsumeResource()
