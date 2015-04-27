@@ -169,7 +169,7 @@ class AcceptTrade:
             except Exception :
                 req.context['code'] = -12
                 req.context['msg'] = "Invalid timePlaced value encountered. Should be in: format '06-MAY-76 07:30:00'"
-            return False
+                return False
 
         return True
 
@@ -184,13 +184,9 @@ class AcceptTrade:
 
         if self.validate(req, resp, items):
             r.connect('localhost', 28015).repl()
-            data = list()
-            for o in items:
-                data.append(r.db('cf').table('trades').insert(o).run())
-            # r.connect('localhost', 28015).repl()
-            # data = r.db('cf').table('trades').count().run()
-            req.context['data'] = data
-
+            req.context['data'] = r.db('cf').table('trades').insert(items).run()
+        else:
+            print "arse"
 
 app = falcon.API(middleware=[
     JsonRequire(),

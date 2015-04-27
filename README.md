@@ -154,12 +154,9 @@ Annual Wires Sent/Received
 Run **`bin/submit.sh`** OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$(python generator/generate.py -l)" http://localhost:8000/trade`
 
 **Success Response** 
+The *data* is the RethinkDB response, as in [Ten-minute guide with RethinkDB and Python](http://rethinkdb.com/docs/guide/python/)
 <pre>
-{
-    'msg': 'OK', 
-    'code': 0, 
-    'data': [{}]
-}
+{'msg': 'OK', 'code': 0, 'data': {u'errors': 0, u'deleted': 0, u'generated_keys': [u'73ac3ea0-1f0b-4080-becc-428d593af1d9'], u'unchanged': 0, u'skipped': 0, u'replaced': 0, u'inserted': 1}}
 </pre>
 
 **Error Response** 
