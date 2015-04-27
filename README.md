@@ -151,9 +151,29 @@ Annual Wires Sent/Received
 ##Message Processor
 
 ###Testing
-`python generator/generate.py -l` - generate a random trade
+Run **`bin/submit.sh`** OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$(python generator/generate.py -l)" http://localhost:8000/trade`
 
-`curl -i --user 'cf!':'CF:$2015' -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$(python generator/generate.py -l)" http://localhost:8000/trade`
+**Success Response** 
+<pre>
+{
+    'msg': 'OK', 
+    'code': 0, 
+    'data': [{}]
+}
+</pre>
+
+**Error Response** 
+<pre>
+HTTP/1.1 200 OK
+* Server nginx is not blacklisted
+Server: nginx
+Date: Mon, 27 Apr 2015 00:32:25 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 186
+Connection: keep-alive
+
+"{'msg': 'Error: Missing required keys for trade. Should include: (userId,currencyFrom,currencyTo,amountSell,amountBuy,rate,timePlaced,originatingCountry)', 'code': -1, 'data': {}}"(cf)vijay@vijay.lan:~/src/cf
+</pre>
  
 ###Setup
 * see `conf/nginx/*.conf` files
