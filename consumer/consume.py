@@ -164,7 +164,6 @@ class AcceptTrade:
                             format(keys=",".join(g.accepted_currencies))
                 return False
 
-            d = time.mktime(time.strptime(o['timePlaced'], '%d-%b-%y %H:%M:%S'))
             try:
                 d = time.mktime(time.strptime(o['timePlaced'], '%d-%b-%y %H:%M:%S'))
             except Exception :
