@@ -1,6 +1,5 @@
 from cf import consume as c
 
-
 def setup():
     print("SETUP!")
 
