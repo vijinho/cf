@@ -4,10 +4,11 @@ Consume POSTed messages for trades
 """
 
 import json
-
-from builtins import *
 import falcon
+import time
 import rethinkdb as r
+from generator import generate as g
+from builtins import *
 
 __author__ = "Vijay Mahrra"
 __copyright__ = "Copyright 2015, Vijay Mahrra"
@@ -106,6 +107,71 @@ class AcceptTrade:
                         "Missing required keys for trade. Should include: ({keys})".\
                             format(keys=",".join(required))
                     return False
+
+            if int(o['userId']) < 1:
+                req.context['code'] = -2
+                req.context['msg'] = "Bad userId encountered. Should be: positive INT"
+                return False
+
+            if float(o['amountSell']) < 1:
+                req.context['code'] = -3
+                req.context['msg'] = "Bad amountSell encountered. Should be: positive FLOAT"
+                return False
+
+            if float(o['amountBuy']) < 1:
+                req.context['code'] = -4
+                req.context['msg'] = "Bad amountBuy encountered. Should be: positive FLOAT"
+                return False
+
+            if float(o['rate']) < 0:
+                req.context['code'] = -5
+                req.context['msg'] = "Bad rate encountered. Should be: positive FLOAT"
+                return False
+
+            if len(o['currencyFrom']) != 3:
+                req.context['code'] = -6
+                req.context['msg'] = "Bad currencyFrom encountered. Should be: format XXX"
+                return False
+
+            if len(o['currencyTo']) != 3:
+                req.context['code'] = -7
+                req.context['msg'] = "Bad currencyTo encountered. Should be: format XXX"
+                return False
+
+            if len(o['originatingCountry']) != 2:
+                req.context['code'] = -8
+                req.context['msg'] = "Bad country encountered. Should be: format XX"
+                return False
+
+            if o['originatingCountry'] not in g.countries:
+                req.context['code'] = -9
+                req.context['msg'] = req.context['msg'] = \
+                        "Invalid country encountered. Should be one of: ({keys})".\
+                            format(keys=",".join(g.countries))
+                return False
+
+            if o['currencyFrom'] not in g.get_currencies():
+                req.context['code'] = -10
+                req.context['msg'] = req.context['msg'] = \
+                        "Invalid currencyFrom encountered. Should be one of: ({keys})".\
+                            format(keys=",".join(g.accepted_currencies))
+                return False
+
+            if o['currencyTo'] not in g.accepted_currencies:
+                req.context['code'] = -11
+                req.context['msg'] = req.context['msg'] = \
+                        "Invalid currencyTo encountered. Should be one of: ({keys})".\
+                            format(keys=",".join(g.accepted_currencies))
+                return False
+
+            d = time.mktime(time.strptime(o['timePlaced'], '%d-%b-%y %H:%M:%S'))
+            try:
+                d = time.mktime(time.strptime(o['timePlaced'], '%d-%b-%y %H:%M:%S'))
+            except Exception :
+                req.context['code'] = -12
+                req.context['msg'] = "Invalid timePlaced value encountered. Should be in: format '06-MAY-76 07:30:00'"
+            return False
+
         return True
 
     @falcon.before(max_body(256 * 1024))

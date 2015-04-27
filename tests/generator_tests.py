@@ -2,7 +2,6 @@ from generator import generate as g
 
 
 def setup():
-    g.setup_global_data()
     print("SETUP!")
 
 
