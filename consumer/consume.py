@@ -19,7 +19,7 @@ __email__ = "vijay.mahrra@gmail.com"
 __status__ = "Development"
 
 
-class jsonRequire(object):
+class JsonRequire(object):
     def process_request(self, req, resp):
         if not req.client_accepts_json:
             raise falcon.HTTPNotAcceptable(
@@ -33,7 +33,7 @@ class jsonRequire(object):
                     href='http://docs.examples.com/api/json')
 
 
-class jsonDecode(object):
+class JsonDecode(object):
     def process_request(self, req, resp):
         if req.content_length in (None, 0):
             return
@@ -64,7 +64,7 @@ class jsonDecode(object):
         msg = req.context['msg']
         code = int(req.context['code'])
         if code is not 0:
-            msg = "Error: {msg}".format(msg = msg)
+            msg = "Error: {msg}".format(msg=msg)
 
         ret['msg'] = msg
         ret['code'] = code
@@ -72,6 +72,7 @@ class jsonDecode(object):
 
         resp.body = json.dumps(str(ret).encode('utf8'), indent=4,
                                sort_keys=True)
+
 
 def max_body(limit):
     def hook(req, resp, resource, params):
@@ -81,6 +82,7 @@ def max_body(limit):
                    'exceed ' + str(limit) + ' bytes in length.')
             raise falcon.HTTPRequestEntityTooLarge(
                 'Request body is too large', msg)
+
     return hook
 
 
@@ -100,7 +102,9 @@ class AcceptTrade:
             for f in required:
                 if f not in fields:
                     req.context['code'] = -1
-                    req.context['msg'] = "Missing required keys for trade. Should include: ({keys})".format(keys = ",".join(required))
+                    req.context['msg'] = \
+                        "Missing required keys for trade. Should include: ({keys})".\
+                            format(keys=",".join(required))
                     return False
         return True
 
@@ -117,14 +121,14 @@ class AcceptTrade:
             data = list()
             for o in items:
                 data.append(o)
-#            r.connect('localhost', 28015).repl()
-#            data = r.db('cf').table('trades').count().run()
+            # r.connect('localhost', 28015).repl()
+            # data = r.db('cf').table('trades').count().run()
             req.context['data'] = data
 
 
 app = falcon.API(middleware=[
-    jsonRequire(),
-    jsonDecode(),
+    JsonRequire(),
+    JsonDecode(),
 ])
 trade = AcceptTrade()
 app.add_route('/trade', trade)
