@@ -98,6 +98,7 @@ class AcceptTrade:
                     'rate',
                     'timePlaced',
                     'originatingCountry']
+
         for o in items:
             fields = o.keys()
             for f in required:
@@ -177,6 +178,9 @@ class AcceptTrade:
     def on_post(self, req, resp):
         try:
             items = req.context['json']
+            # if we are dealing with a single trade object, put it in a list
+            if not isinstance(items, (list)):
+                items = [items]
         except KeyError:
             raise falcon.HTTPBadRequest(
                 'Missing thing',
@@ -185,8 +189,6 @@ class AcceptTrade:
         if self.validate(req, resp, items):
             r.connect('localhost', 28015).repl()
             req.context['data'] = r.db('cf').table('trades').insert(items).run()
-        else:
-            print "arse"
 
 app = falcon.API(middleware=[
     JsonRequire(),
