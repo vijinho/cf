@@ -2,6 +2,7 @@
 """
 Generate some random data for the CF engineering challenge
 """
+import os
 import codecs
 import json
 import random
@@ -9,7 +10,6 @@ import time
 import click
 
 from builtins import *
-
 
 __author__ = "Vijay Mahrra"
 __copyright__ = "Copyright 2015, Vijay Mahrra"
@@ -20,6 +20,7 @@ __maintainer__ = "Vijay Mahrra"
 __email__ = "vijay.mahrra@gmail.com"
 __status__ = "Development"
 
+root_directory = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 
 def load_json(filename, key):
     """
@@ -28,6 +29,7 @@ def load_json(filename, key):
     :param key: index data with this attribute key
     :return: dict of objects indexed by key
     """
+    filename = os.path.join(root_directory, filename)
     with codecs.open(filename, 'r', 'utf8') as fh:
         objects = json.loads(fh.read())
     data = dict()
@@ -58,6 +60,7 @@ def get_regions(filename='data/regions.json'):
     :param filename:
     :return: dict of countries indexed by region name
     """
+    filename = os.path.join(root_directory, filename)
     with codecs.open(filename, 'r', 'utf8') as fh:
         objects = json.loads(fh.read())
     data = dict()
@@ -420,6 +423,7 @@ def setup_global_data():
     accepted_currencies = list(rates['2015']['rates'].keys())
 
 setup_global_data()
+
 
 @click.command()
 @click.option('--live', '-l', is_flag=True, default=False, help="Simulate a live trade?")
