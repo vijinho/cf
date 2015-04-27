@@ -63,7 +63,7 @@ class JsonDecode(object):
 
         msg = req.context['msg']
         code = int(req.context['code'])
-        if code is not 0:
+        if code != 0:
             msg = "Error: {msg}".format(msg=msg)
 
         ret['msg'] = msg
