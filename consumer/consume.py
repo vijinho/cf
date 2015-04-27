@@ -8,6 +8,7 @@ import falcon
 import time
 import rethinkdb as r
 from generator import generate as g
+from processor import tasks as t
 from builtins import *
 
 __author__ = "Vijay Mahrra"
@@ -193,7 +194,13 @@ class AcceptTrade:
 
         if self.validate(req, resp, items):
             r.connect('localhost', 28015).repl()
-            req.context['data'] = r.db('cf').table('trades').insert(items).run()
+            data = r.db('cf').table('trades').insert(items).run()
+            if 'generated_keys' in data:
+                # send inserted trades to the processor
+                for k in data['generated_keys']:
+                    t.process_trade.delay(k)
+
+            req.context['data'] = data
 
 app = falcon.API(middleware=[
     JsonRequire(),

@@ -1,2 +1,2 @@
-cd processor
-celery -A tasks worker --loglevel=info
+#cd processor
+celery -A processor.tasks worker --loglevel=info

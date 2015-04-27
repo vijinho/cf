@@ -8,6 +8,7 @@ import time
 from celery import Celery
 import rethinkdb as r
 #from generator import generate as g
+#from processor import tasks as t
 from builtins import *
 
 __author__ = "Vijay Mahrra"
@@ -35,15 +36,14 @@ app.conf.update(
 )
 
 @app.task
-def get_trade(id):
-    return r.db('cf').table('trades').get(id).run()
+def get_trade(k):
+    return r.db('cf').table('trades').get(k).run()
 
 @app.task
-def process_trade(id):
-    trade = get_trade(id)
-    if not trade:
-        return False
-    return trade
+def process_trade(k):
+    trade = r.db('cf').table('trades').get(k).run()
+    if trade:
+        return trade
 
 if __name__ == '__main__':
     pass

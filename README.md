@@ -10,10 +10,10 @@
 
 ##RethinkDB Setup
 
-1. `rethinkdb create`
+1. Open a shell and `rethinkdb create`
 2. `rethinkdb serve`
 3. [http://localhost:8080](http://localhost:8080)
-4. Create database **cf**, table **trades**
+4. In another shell `bin/rethink_createdb.py` to create database 'cf' and table 'trades' within it.
  
 [RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
 
@@ -201,6 +201,7 @@ Connection: keep-alive
 - BASIC HTTP Authentication created file with - `htpasswd -c -b -B -C 10 .htpasswd <filename> <username> <password>` for more security than default - can be run as `bin/pw.sh <filename> <username> <password>`
 
 ####gunicorn
+Starting: open a shell and `bin/startconsumer.sh` which does:
 
 `gunicorn --timeout 15 --graceful-timeout 10 --max-requests 16384 --max-requests-jitter 4096 --limit-request-line 256 --limit-request-fields 32 --limit-request-field_size 1024 consume:app` 
 
@@ -217,10 +218,16 @@ Connection: keep-alive
   * Listening at: http://127.0.0.1:8000
 * **nginx**
   * Listening 80
+* **RabbitMQ**
+  * connected to epmd (port 4369) on localhost
+* **Celery**
+  * amqp://guest:**@localhost:5672//
 
 #Message Processor
 ##Start Tasks Handler
-`bin/celery_start.sh`
+1. Open a shell and `rabbitmq-server`
+2. Open another shell and `bin/celery_start.sh`
+
 ###Manual Celery Test
 <pre>
 python
