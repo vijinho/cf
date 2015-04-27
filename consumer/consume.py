@@ -119,12 +119,12 @@ class AcceptTrade:
                 req.context['msg'] = "Bad amountSell encountered. Should be: positive FLOAT"
                 return False
 
-            if float(o['amountBuy']) < 1:
+            if float(o['amountBuy']) <= 0:
                 req.context['code'] = -4
                 req.context['msg'] = "Bad amountBuy encountered. Should be: positive FLOAT"
                 return False
 
-            if float(o['rate']) < 0:
+            if float(o['rate']) <= 0:
                 req.context['code'] = -5
                 req.context['msg'] = "Bad rate encountered. Should be: positive FLOAT"
                 return False

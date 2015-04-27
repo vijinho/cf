@@ -151,7 +151,9 @@ Annual Wires Sent/Received
 ##Message Processor
 
 ###Testing
-Run **`bin/submit.sh`** OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$(python generator/generate.py -l)" http://localhost:8000/trade`
+Run **`bin/submit.sh N`** where N is the number of trades 
+
+OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -<NUMBER> POST -d "$(python generator/generate.py -l -q $1)" http://localhost:80/trade`
 
 **Success Response** 
 The *data* is the RethinkDB response, as in [Ten-minute guide with RethinkDB and Python](http://rethinkdb.com/docs/guide/python/)
