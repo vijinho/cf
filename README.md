@@ -40,6 +40,7 @@ Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicor
 
 ###Why Gunicorn?
 It's a pre-fork worker model ported from Ruby's Unicorn project. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resources, and fairly speedy.
+**DO NOT scale the number of workers to the number of clients you expect to have. Gunicorn should only need 4-12 worker processes to handle hundreds or thousands of requests per second.**
 
 ###Why Nginx?
 [How to deploy Nginx/Python apps](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx)
@@ -149,7 +150,26 @@ Annual Wires Sent/Received
 
 ##Message Processor
 
+###Testing
+`python generator/generate.py -l` - generate a random trade
 
+`curl -i --user 'cf!':'CF:$2015' -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$(python generator/generate.py -l)" http://localhost:8000/trade`
+ 
+###Setup
+* see `conf/nginx/*.conf` files
+
+###Security
+####nginx
+- 100000 'trades' in a formatted JSON file (using above script) size is 24MB.  
+- Will rate limit each request to 1000 trades - approx 245K, round up to 256K `limit_req zone=limit burst=5 nodelay;` and `client_body_buffer_size 4k;`
+- `limit_req_zone $binary_remote_addr zone=limit:256k rate=10r/s;` - Hard limit 256k sized request rate=10r/s 
+- `limit_conn_zone $binary_remote_addr zone=perip:10m;` - `limit_conn perip 4;` - 4 connections limit per ip 
+- BASIC HTTP Authentication created file with - `htpasswd -c -b -B -C 10 .htpasswd <filename> <username> <password>` for more security than default - can be run as `bin/pw.sh <filename> <username> <password>`
+####gunicorn
+
+[settings](http://docs.gunicorn.org/en/latest/settings.html)
+
+`gunicorn --timeout 15 --graceful-timeout 10 --max-requests 16384 --max-requests-jitter 4096 --limit-request-line 256 --limit-request-fields 32 --limit-request-field_size 1024 consume:app` 
 
 ##Frontend
 
