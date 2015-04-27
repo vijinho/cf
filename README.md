@@ -14,39 +14,13 @@
 2. `rethinkdb serve`
 3. [http://localhost:8080](http://localhost:8080)
 4. Create database **cf**, table **trades**
-5. Generate random data: `python generator/generate.py -h -q 100000 -f data/random.json` - 100k documents
-6. Import data: `rethinkdb import --force --format json -f random.json --table cf.trades`
-7. In Data Explorer: `r.db('cf').table('trades').count()`
-8. Test Python script: `python bin/rethink_test.py` which runs the same query
  
 [RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
 
 * Has a web interface to see realtime statistics on what’s going on. 
 * Can shard, replicate and index tables individually via web interface
 
-
-##Message Consumer
-
-Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy.
-
-**Starting**: `bin/startconsumer.sh` or `cd consumer && gunicorn consume:app`
-
-###Why Falcon?
-- Falcon is a very fast, minimalist Python framework for building cloud APIs and app backends.
-- Falcon encourages the REST architectural style
-- Performance. Unlike other Python web frameworks, Falcon won't bottleneck your API's performance under highly concurrent workloads. 
-- Freedom. Falcon isn't very opinionated. In other words, the framework leaves a lot of decisions and implementation details to you, the API developer
-- Reliable - 100% code coverage.
-
-###Why Gunicorn?
-It's a pre-fork worker model ported from Ruby's Unicorn project. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resources, and fairly speedy.
-**DO NOT scale the number of workers to the number of clients you expect to have. Gunicorn should only need 4-12 worker processes to handle hundreds or thousands of requests per second.**
-
-###Why Nginx?
-[How to deploy Nginx/Python apps](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx)
-Nginx is known for its high performance, stability, rich feature set, simple configuration, and low resource consumption and is one of a handful of servers written to address the [C10K problem](http://www.kegel.com/c10k.html)
-
-###Testing/Data
+##Testing/Data
 
 ####Message Generator
 
@@ -92,6 +66,13 @@ Options:
 - `python generator/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` generate 10 historic trades between the date range 12-25 December 2012
 - `python generator/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` generate trades totally 500,000 for the date 6 May 2013
 - `python generator/generate.py --quantity=5 --outfile=test.json`  write 5 random historic trades to the file test.json
+
+#####Rethink Example Data Import  
+1. Generate random data: `python generator/generate.py -h -q 100000 -f data/random.json` - 100k documents
+2. Import data: `rethinkdb import --force --format json -f random.json --table cf.trades`
+3. In Data Explorer: `r.db('cf').table('trades').count()`
+4. Test Python script: `python bin/rethink_test.py` which runs the same query
+
   
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
@@ -137,18 +118,28 @@ Opportunities for Financial Institutions](https://www.frbservices.org/files/comm
 - [USE OF CURRENCIES IN INTERNATIONAL TRADE: ANY CHANGES IN THE
 PICTURE?](https://www.wto.org/english/res_e/reser_e/ersd201210_e.pdf)
  
-US Fed data on companies:
-<pre>
-Annual Wires Sent/Received
-10-14 3%
-15-24 6
-25-49 5
-50-99 22
-100-199 17
-200+ 47
-</pre>
 
-##Message Processor
+##Message Consumer
+
+Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy using Basic Authentication.
+
+**Starting**: `bin/startconsumer.sh` server on Port:8000 - 
+nginx on Port:80 proxies to this but when testing locally can be used directly
+
+###Why Falcon?
+- Falcon is a very fast, minimalist Python framework for building cloud APIs and app backends.
+- Falcon encourages the REST architectural style
+- Performance. Unlike other Python web frameworks, Falcon won't bottleneck your API's performance under highly concurrent workloads. 
+- Freedom. Falcon isn't very opinionated. In other words, the framework leaves a lot of decisions and implementation details to you, the API developer
+- Reliable - 100% code coverage.
+
+###Why Gunicorn?
+It's a pre-fork worker model ported from Ruby's Unicorn project. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resources, and fairly speedy.
+**DO NOT scale the number of workers to the number of clients you expect to have. Gunicorn should only need 4-12 worker processes to handle hundreds or thousands of requests per second.**
+
+###Why Nginx?
+[How to deploy Nginx/Python apps](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx)
+Nginx is known for its high performance, stability, rich feature set, simple configuration, and low resource consumption and is one of a handful of servers written to address the [C10K problem](http://www.kegel.com/c10k.html)
 
 ###Testing
 Run **`bin/submit.sh N`** where N is the number of trades 
@@ -158,7 +149,23 @@ OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 
 **Success Response** 
 The *data* is the RethinkDB response, as in [Ten-minute guide with RethinkDB and Python](http://rethinkdb.com/docs/guide/python/)
 <pre>
-{'msg': 'OK', 'code': 0, 'data': {u'errors': 0, u'deleted': 0, u'generated_keys': [u'73ac3ea0-1f0b-4080-becc-428d593af1d9'], u'unchanged': 0, u'skipped': 0, u'replaced': 0, u'inserted': 1}}
+[{  
+    "msg":"OK",
+    "code":0,
+    "data":{  
+        "errors":0,
+        "deleted":0,
+        "generated_keys":[  
+            "6c2c2797-b5fd-45d8-8fe3-f2eb91da50e8",
+            "1d4bc741-20a1-401d-8a2b-85d0872e0432",
+            "de44cccf-21aa-40e0-9503-855a467d057b"
+        ],
+        "unchanged":0,
+        "skipped":0,
+        "replaced":0,
+        "inserted":3
+    }
+}]
 </pre>
 
 **Error Response** 
@@ -171,7 +178,15 @@ Content-Type: application/json; charset=utf-8
 Content-Length: 186
 Connection: keep-alive
 
-"{'msg': 'Error: Missing required keys for trade. Should include: (userId,currencyFrom,currencyTo,amountSell,amountBuy,rate,timePlaced,originatingCountry)', 'code': -1, 'data': {}}"(cf)vijay@vijay.lan:~/src/cf
+[  
+    {  
+        "msg":"Error: Missing required keys for trade. Should include: (userId,currencyFrom,currencyTo,amountSell,amountBuy,rate,timePlaced,originatingCountry)",
+        "code":-1,
+        "data":{  
+
+        }
+    }
+]
 </pre>
  
 ###Setup
@@ -184,17 +199,15 @@ Connection: keep-alive
 - `limit_req_zone $binary_remote_addr zone=limit:256k rate=10r/s;` - Hard limit 256k sized request rate=10r/s 
 - `limit_conn_zone $binary_remote_addr zone=perip:10m;` - `limit_conn perip 4;` - 4 connections limit per ip 
 - BASIC HTTP Authentication created file with - `htpasswd -c -b -B -C 10 .htpasswd <filename> <username> <password>` for more security than default - can be run as `bin/pw.sh <filename> <username> <password>`
-####gunicorn
 
-[settings](http://docs.gunicorn.org/en/latest/settings.html)
+####gunicorn
 
 `gunicorn --timeout 15 --graceful-timeout 10 --max-requests 16384 --max-requests-jitter 4096 --limit-request-line 256 --limit-request-fields 32 --limit-request-field_size 1024 consume:app` 
 
-##Frontend
+[see settings](http://docs.gunicorn.org/en/latest/settings.html)
 
 
-#Notes
-##Ports
+###Ports
 
 * **RethinkDB**
   * Listening for intracluster connections on port 29015
@@ -204,3 +217,6 @@ Connection: keep-alive
   * Listening at: http://127.0.0.1:8000
 * **nginx**
   * Listening 80
+
+#Message Processor
+
