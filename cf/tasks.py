@@ -43,7 +43,10 @@ def process_trade(k):
     trade = r.db('cf').table('trades').get(k).run()
     if trade:
         return trade
+    else:
+        return 'Fail'
 
 if __name__ == '__main__':
-    pass
-#    print("Start from top-level with bin/startprocessor.sh")
+    #celeryctl purge
+    from celery.task.control import discard_all
+    discard_all()

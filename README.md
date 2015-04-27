@@ -225,9 +225,13 @@ Starting: open a shell and `bin/start_gunicorn.sh`
   * amqp://guest:**@localhost:5672//
 
 #Message Processor
+
 ##Start Tasks Handler
+
 1. `bin/start_rabbitmq.sh`
 2. `bin/start_celery.sh`
+
+**purge tasks**: `python cf/tasks.py`
 
 ###Manual Celery Test
 <pre>
