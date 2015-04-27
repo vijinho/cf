@@ -11,9 +11,9 @@
 ##RethinkDB Setup
 
 1. Open a shell and `rethinkdb create`
-2. `rethinkdb serve`
+2. `bin/start_rethinkdb.sh`
 3. [http://localhost:8080](http://localhost:8080)
-4. In another shell `bin/rethink_createdb.py` to create database 'cf' and table 'trades' within it.
+4. In another shell `bin/createdb.py` to create database 'cf' and table 'trades' within it.
  
 [RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
 
@@ -40,7 +40,7 @@ Based on the example:
 
 #####Usage
 <pre>
-> python generator/generate.py --help
+> python cf/generate.py --help
 Usage: generate.py [OPTIONS]
 
 Options:
@@ -60,19 +60,18 @@ Options:
 </pre>
 
 ######Examples
-- `python generator/generate.py --live --quantity=10` generate 10 trades timestamped NOW
-- `python generator/generate.py --today --amount=100000` generate trades totalling around €100000 in value for today with random times
-- `python generator/generate.py --historic --quantity=5` generate 5 random historic trades
-- `python generator/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` generate 10 historic trades between the date range 12-25 December 2012
-- `python generator/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` generate trades totally 500,000 for the date 6 May 2013
-- `python generator/generate.py --quantity=5 --outfile=test.json`  write 5 random historic trades to the file test.json
+- `python cf/generate.py --live --quantity=10` generate 10 trades timestamped NOW
+- `python cf/generate.py --today --amount=100000` generate trades totalling around €100000 in value for today with random times
+- `python cf/generate.py --historic --quantity=5` generate 5 random historic trades
+- `python cf/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` generate 10 historic trades between the date range 12-25 December 2012
+- `python cf/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` generate trades totally 500,000 for the date 6 May 2013
+- `python cf/generate.py --quantity=5 --outfile=test.json`  write 5 random historic trades to the file test.json
 
 #####Rethink Example Data Import  
-1. Generate random data: `python generator/generate.py -h -q 100000 -f data/random.json` - 100k documents
-2. Import data: `rethinkdb import --force --format json -f random.json --table cf.trades`
-3. In Data Explorer: `r.db('cf').table('trades').count()`
-4. Test Python script: `python bin/rethink_test.py` which runs the same query
-
+1. Generate random trade data: `python cf/generate.py -h -q 100000 -f data/random.json` - 100k documents
+2. Import generated trade data: `rethinkdb import --force --format json -f random.json --table cf.trades`
+3. In Data Explore Web UIr: `r.db('cf').table('trades').count()`
+4. Test Python script: `python bin/count_trades.py` which runs the same query
   
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
@@ -123,8 +122,10 @@ PICTURE?](https://www.wto.org/english/res_e/reser_e/ersd201210_e.pdf)
 
 Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy using Basic Authentication.
 
-**Starting**: `bin/startconsumer.sh` server on Port:8000 - 
-nginx on Port:80 proxies to this but when testing locally can be used directly
+###Starting
+
+- `bin/start_nginx.sh` nginx on Port 80 proxies to 8000
+- `bin/start_gunicorn.sh` on Port 8000
 
 ###Why Falcon?
 - Falcon is a very fast, minimalist Python framework for building cloud APIs and app backends.
@@ -141,10 +142,12 @@ It's a pre-fork worker model ported from Ruby's Unicorn project. The Gunicorn se
 [How to deploy Nginx/Python apps](https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-apps-using-gunicorn-http-server-behind-nginx)
 Nginx is known for its high performance, stability, rich feature set, simple configuration, and low resource consumption and is one of a handful of servers written to address the [C10K problem](http://www.kegel.com/c10k.html)
 
-###Testing
-Run **`bin/submit.sh N`** where N is the number of trades 
+###Testing (localhost)
 
-OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -<NUMBER> POST -d "$(python generator/generate.py -l -q $1)" http://localhost:80/trade`
+- Run **`bin/send-random-trade.sh N`** where N is the number of trades 
+- Run **`bin/send-random-trade-direct.sh N`** skip using the proxy
+
+OR `curl -i --user 'USERNAME':'PASSWORD' -H 'Content-Type: application/json' -H 'Accept: application/json' -<NUMBER> POST -d "$(python cf/generate.py -l -q $1)" http://localhost:80/trade`
 
 **Success Response** 
 The *data* is the RethinkDB response, as in [Ten-minute guide with RethinkDB and Python](http://rethinkdb.com/docs/guide/python/)
@@ -201,9 +204,7 @@ Connection: keep-alive
 - BASIC HTTP Authentication created file with - `htpasswd -c -b -B -C 10 .htpasswd <filename> <username> <password>` for more security than default - can be run as `bin/pw.sh <filename> <username> <password>`
 
 ####gunicorn
-Starting: open a shell and `bin/startconsumer.sh` which does:
-
-`gunicorn --timeout 15 --graceful-timeout 10 --max-requests 16384 --max-requests-jitter 4096 --limit-request-line 256 --limit-request-fields 32 --limit-request-field_size 1024 consume:app` 
+Starting: open a shell and `bin/start_gunicorn.sh`
 
 [see settings](http://docs.gunicorn.org/en/latest/settings.html)
 
@@ -225,8 +226,8 @@ Starting: open a shell and `bin/startconsumer.sh` which does:
 
 #Message Processor
 ##Start Tasks Handler
-1. Open a shell and `rabbitmq-server`
-2. Open another shell and `bin/celery_start.sh`
+1. `bin/start_rabbitmq.sh`
+2. `bin/start_celery.sh`
 
 ###Manual Celery Test
 <pre>

@@ -1,4 +1,4 @@
-from consumer import consume as c
+from cf import consume as c
 
 
 def setup():

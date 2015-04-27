@@ -7,8 +7,7 @@ import json
 import time
 from celery import Celery
 import rethinkdb as r
-#from generator import generate as g
-#from processor import tasks as t
+#from cf import generate as g
 from builtins import *
 
 __author__ = "Vijay Mahrra"

@@ -1,4 +1,4 @@
-from generator import generate as g
+from cf import generate as g
 
 
 def setup():
