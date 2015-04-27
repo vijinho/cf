@@ -45,7 +45,8 @@ class jsonDecode(object):
         try:
             req.context['json'] = json.loads(body.decode('utf-8'))
             req.context['code'] = 0
-            req.context['msg'] = 'ok'
+            req.context['msg'] = 'OK'
+            req.context['data'] = {}
         except (ValueError, UnicodeDecodeError):
             raise falcon.HTTPError(falcon.HTTP_753,
                                    'Malformed JSON',
@@ -59,12 +60,18 @@ class jsonDecode(object):
             return
 
         ret = dict()
-        ret['code'] = req.context['code']
-        ret['msg'] = req.context['msg']
+
+        msg = req.context['msg']
+        code = int(req.context['code'])
+        if code is not 0:
+            msg = "Error: {msg}".format(msg = msg)
+
+        ret['msg'] = msg
+        ret['code'] = code
         ret['data'] = req.context['data']
+
         resp.body = json.dumps(str(ret).encode('utf8'), indent=4,
                                sort_keys=True)
-
 
 def max_body(limit):
     def hook(req, resp, resource, params):
@@ -92,10 +99,10 @@ class AcceptTrade:
             fields = o.keys()
             for f in required:
                 if f not in fields:
-                    req.context['code'] = 1
-                    req.context['msg'] = 'Missing required fields for trade.'
+                    req.context['code'] = -1
+                    req.context['msg'] = "Missing required keys for trade. Should include: ({keys})".format(keys = ",".join(required))
                     return False
-        return items
+        return True
 
     @falcon.before(max_body(256 * 1024))
     def on_post(self, req, resp):
@@ -107,10 +114,11 @@ class AcceptTrade:
                 'A thing must be submitted in the request body.')
 
         if self.validate(req, resp, items):
-            if len(items) == 1:
-                item = items[0]
-            r.connect('localhost', 28015).repl()
-            data = r.db('cf').table('trades').count().run()
+            data = list()
+            for o in items:
+                data.append(o)
+#            r.connect('localhost', 28015).repl()
+#            data = r.db('cf').table('trades').count().run()
             req.context['data'] = data
 
 
