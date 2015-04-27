@@ -21,8 +21,6 @@ __status__ = "Development"
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 
-r.connect('localhost', 28015).repl()
-
 from celery import Celery
 
 app = Celery('tasks', backend='amqp', broker='amqp://guest@localhost//')
@@ -34,20 +32,43 @@ app.conf.update(
     CELERY_ENABLE_UTC=True,
 )
 
-@app.task
-def get_trade(k):
-    return r.db('cf').table('trades').get(k).run()
+def database(func):
+    def connect(*args, **kwargs):
+        r.connect('localhost', 28015).repl()
+        return func(*args, **kwargs)
+    return connect
 
 @app.task
+@database
+def get_trade(k):
+    """
+    Get a submitted trade if it exists
+    :param k: id of the item in the database
+    :return: the processed data item as JSON or None
+    """
+    return r.db('cf').table('trades').get(k).run()
+
+@app.task()
+@database
 def process_trade(k):
+    """
+    Process a submitted 'trade'
+    :param k: id of the item in the database
+    :return: the processed data item as JSON or False
+    """
     trade = r.db('cf').table('trades').get(k).run()
     if trade:
-        data = r.db('cf').table('processed').insert(trade).run()
-        return data
+        exists = r.db('cf').table('processed').get(k).run()
+        if exists is None:
+            data = r.db('cf').table('processed').insert(trade).run()
+            return data
+        else:
+            return exists
     else:
-        return 'Fail'
+        return False
 
 if __name__ == '__main__':
     #celeryctl purge
     from celery.task.control import discard_all
     discard_all()
+    print(process_trade('ca7a131b-6b8b-4541-a7e9-f4e1e6090400'))

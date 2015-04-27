@@ -7,6 +7,7 @@ import json
 import falcon
 import time
 import rethinkdb as r
+from celery import Celery
 from cf import generate as g
 from cf import tasks as t
 from builtins import *
@@ -196,9 +197,11 @@ class AcceptTrade:
             r.connect('localhost', 28015).repl()
             data = r.db('cf').table('trades').insert(items).run()
             if 'generated_keys' in data:
-                # send inserted trades to the processor
+                # send inserted trades to the processor,
                 for k in data['generated_keys']:
-                    t.process_trade.delay(k)
+                    print(k)
+                    # start tasks in 10 seconds, expire in 10 minutes
+                    t.process_trade.apply_async(args=[k], countdown=3, expires=600)
 
             req.context['data'] = data
 
