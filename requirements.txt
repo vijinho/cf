@@ -6,3 +6,4 @@ rethinkdb
 cython
 falcon
 gunicorn
+librabbitmq

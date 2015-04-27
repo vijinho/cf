@@ -139,6 +139,11 @@ class AcceptTrade:
                 req.context['msg'] = "Bad currencyTo encountered. Should be: format XXX"
                 return False
 
+            if o['currencyFrom'] == o['currencyTo']:
+                req.context['code'] = -13
+                req.context['msg'] = "currencyTo cannot be the same as currencyFrom! They should be different!"
+                return False
+
             if len(o['originatingCountry']) != 2:
                 req.context['code'] = -8
                 req.context['msg'] = "Bad country encountered. Should be: format XX"

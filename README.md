@@ -5,8 +5,8 @@
 - `pip install -r requirements.txt`
 - RethinkDB: [brew](http://brew.sh/) - `brew install rethinkdb`
 - Nginx: (How to setup an nginx SSL-forwarding proxy)[https://gist.github.com/vijinho/2a59d7660ecc0c7d8c2b]
-- TBD Task Queue: [Celery](http://www.celeryproject.org/) - `sudo easy_install Celery`
-- TBD Message Queueing: [RabbitMQ](https://www.rabbitmq.com/) - `brew install rabbitmq`
+- Task Queue: [Celery](http://www.celeryproject.org/) - `sudo easy_install Celery`
+- Message Queueing: [RabbitMQ](https://www.rabbitmq.com/) - `brew install rabbitmq`
 
 ##RethinkDB Setup
 
@@ -219,4 +219,15 @@ Connection: keep-alive
   * Listening 80
 
 #Message Processor
-
+##Start Tasks Handler
+`bin/celery_start.sh`
+###Manual Celery Test
+<pre>
+python
+>>> from tasks import process_trade
+>>> result = process_trade.delay('0000a961-2701-4174-997c-de1a1235e17c')
+>>> result.status
+u'SUCCESS'
+>>> result.get()
+{u'amountBuyEur': 4935.41, u'originatingCountry': u'US', u'userId': 16082, u'amountBuy': 49837.81, u'currencyFrom': u'USD', u'rate': 10.10309, u'timePlaced': u'23-MAR-13 11:46:10', u'currencyTo': u'HKD', u'amountSell': 6419, u'id': u'0000a961-2701-4174-997c-de1a1235e17c'}
+</pre>
