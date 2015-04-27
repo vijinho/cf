@@ -183,9 +183,10 @@ class AcceptTrade:
                 'A thing must be submitted in the request body.')
 
         if self.validate(req, resp, items):
+            r.connect('localhost', 28015).repl()
             data = list()
             for o in items:
-                data.append(o)
+                data.append(r.db('cf').table('trades').insert(o).run())
             # r.connect('localhost', 28015).repl()
             # data = r.db('cf').table('trades').count().run()
             req.context['data'] = data
