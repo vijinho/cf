@@ -42,7 +42,8 @@ def get_trade(k):
 def process_trade(k):
     trade = r.db('cf').table('trades').get(k).run()
     if trade:
-        return trade
+        data = r.db('cf').table('processed').insert(trade).run()
+        return data
     else:
         return 'Fail'
 

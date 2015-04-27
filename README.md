@@ -8,18 +8,6 @@
 - Task Queue: [Celery](http://www.celeryproject.org/) - `sudo easy_install Celery`
 - Message Queueing: [RabbitMQ](https://www.rabbitmq.com/) - `brew install rabbitmq`
 
-##RethinkDB Setup
-
-1. Open a shell and `rethinkdb create`
-2. `bin/start_rethinkdb.sh`
-3. [http://localhost:8080](http://localhost:8080)
-4. In another shell `bin/createdb.py` to create database 'cf' and table 'trades' within it.
- 
-[RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
-
-* Has a web interface to see realtime statistics on what’s going on. 
-* Can shard, replicate and index tables individually via web interface
-
 ##Testing/Data
 
 ####Message Generator
@@ -66,12 +54,6 @@ Options:
 - `python cf/generate.py --historic --quantity=10 -s'13-DEC-12 00:00:00' -e'25-DEC-12 05:30:00'` generate 10 historic trades between the date range 12-25 December 2012
 - `python cf/generate.py --amount=5000000 -s'06-MAY-13 00:00:00' -e'06-MAY-13 00:00:00'` generate trades totally 500,000 for the date 6 May 2013
 - `python cf/generate.py --quantity=5 --outfile=test.json`  write 5 random historic trades to the file test.json
-
-#####Rethink Example Data Import  
-1. Generate random trade data: `python cf/generate.py -h -q 100000 -f data/random.json` - 100k documents
-2. Import generated trade data: `rethinkdb import --force --format json -f random.json --table cf.trades`
-3. In Data Explore Web UIr: `r.db('cf').table('trades').count()`
-4. Test Python script: `python bin/count_trades.py` which runs the same query
   
 #####Random Data Simulator and Validator Rules
 I wanted to make as realistic a simulator to real data as possible so I tried to find out what I could about the company and public financial data to help make educated guesses for the values.
@@ -116,11 +98,32 @@ Opportunities for Financial Institutions](https://www.frbservices.org/files/comm
 - [Trade finance: developments and issues](http://www.bis.org/publ/cgfs50.pdf)
 - [USE OF CURRENCIES IN INTERNATIONAL TRADE: ANY CHANGES IN THE
 PICTURE?](https://www.wto.org/english/res_e/reser_e/ersd201210_e.pdf)
+
+##RethinkDB Setup
+
+1. Open a shell and `rethinkdb create`
+2. `bin/start_rethinkdb.sh`
+3. [http://localhost:8080](http://localhost:8080)
+4. In another shell `bin/createdb.py` to create database 'cf' and table 'trades' within it.
  
+[RethinkDB is amazing](http://rob.conery.io/2015/04/17/rethinkdb-2-0-is-amazing/) I went with [RethinkDB](http://www.rethinkdb.com/) and highlight my reasons below:
+
+* Has a web interface to see realtime statistics on what’s going on. 
+* Can shard, replicate and index tables individually via web interface
+
+###Rethink Example Data Import  
+1. Generate random trade data: `python cf/generate.py -h -q 100000 -f data/random.json` - 100k documents
+2. Import generated trade data: `rethinkdb import --force --format json -f random.json --table cf.trades`
+3. In Data Explore Web UIr: `r.db('cf').table('trades').count()`
+4. Test Python script: `python bin/count_trades.py` which runs the same query
+
 
 ##Message Consumer
 
-Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy using Basic Authentication.
+- Uses [Python Falcon Framework](http://falconframework.org/) served with [Gunicorn](http://gunicorn.org/) behind an [nginx](http://wiki.nginx.org/Main) proxy using Basic Authentication.
+- For performance, this does NO extra processing, it simply handles the task of validating incoming data and then stores each incoming 'trade' or JSON array of trades into the table called 'trades'
+- If the whole data is not 'perfect' according to the validation, the entire request is rejected, with an explanation message in the returned JSON.
+- It then creates a processing task with celery to further process the data, which then stores processed data into the table 'processed'
 
 ###Starting
 
@@ -226,12 +229,16 @@ Starting: open a shell and `bin/start_gunicorn.sh`
 
 #Message Processor
 
+- Whenever a new task completed by celery it creates an entry in the 'processed' table using the same data from the original trade.
+- Once messages are in the 'processed' table they are considered valid and complete, and can be used to generate stats.
+
 ##Start Tasks Handler
 
 1. `bin/start_rabbitmq.sh`
 2. `bin/start_celery.sh`
 
 **purge tasks**: `python cf/tasks.py`
+
 
 ###Manual Celery Test
 <pre>
