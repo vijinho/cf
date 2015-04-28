@@ -30,6 +30,7 @@ app.conf.update(
     CELERY_RESULT_SERIALIZER='json',
     CELERY_TIMEZONE='Europe/London',
     CELERY_ENABLE_UTC=True,
+    CELERY_IGNORE_RESULT = True,
 )
 
 def database(func):
