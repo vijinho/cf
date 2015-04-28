@@ -200,8 +200,8 @@ class AcceptTrade:
                 # send inserted trades to the processor,
                 for k in data['generated_keys']:
                     print(k)
-                    # start tasks in 60 seconds, expire in 1 hour
-                    t.process_trade.apply_async(args=[k], countdown=60, expires=3600)
+                    # start tasks in 30 seconds, expire in 10 mins
+                    t.process_trade.apply_async(args=[k], countdown=30, expires=600)
 
             req.context['data'] = data
 
