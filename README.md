@@ -241,9 +241,9 @@ Starting: open a shell and `bin/start_gunicorn.sh`
 
 ##GET /trade?id=ID
 
-GET /trade?id={ID} - Returns the JSON document for ID. Auto-resubmit if found in 'trades' but not yet processed.
+GET /trade?id={ID} - Returns the JSON document(s) for ID. Auto-resubmit if found in 'trades' but not yet processed.
 
-###Get a processed document
+###Get a document
 e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
 <pre>
 
@@ -267,6 +267,12 @@ e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
     }, 
     "msg": "OK"
 }
+</pre>
+
+###Get all documents
+e.g. GET /trade
+<pre>
+
 </pre>
 
 ###Get a bad document

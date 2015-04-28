@@ -221,7 +221,7 @@ class AcceptTrade:
 
             req.context['data'] = data
 
-    @falcon.before(max_body(256))
+    @falcon.before(max_body(0))
     def on_get(self, req, resp):
         k = req.get_param('id', False)
         req.context['data'] = {}
@@ -245,6 +245,8 @@ class AcceptTrade:
         else:
             req.context['msg'] = "Missing GET query param: id"
             req.context['code'] = -13
+#            r.connect('localhost', 28015).repl()
+#            req.context['data'] = r.db('cf').table('trades').run()
 
 
 app = falcon.API(middleware=[
