@@ -6,6 +6,7 @@ Consume POSTed messages for trades
 import json
 import falcon
 import time
+import datetime as dt
 import rethinkdb as r
 from celery import Celery
 from cf import generate as g
@@ -200,8 +201,8 @@ class AcceptTrade:
                 # send inserted trades to the processor,
                 for k in data['generated_keys']:
                     print(k)
-                    # start tasks in 30 seconds, expire in 10 mins
-                    t.process_trade.apply_async(args=[k], countdown=30, expires=600)
+                    # start tasks in 30 seconds, expire in 10 mins from NOW
+                    t.process_trade.apply_async(args=[k], countdown=30, expires=dt.datetime.now() + dt.timedelta(minutes=10))
 
             req.context['data'] = data
 
