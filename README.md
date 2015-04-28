@@ -246,7 +246,6 @@ GET /trade?id={ID} - Returns the JSON document(s) for ID. Auto-resubmit if found
 ###Get a document
 e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
 <pre>
-
 {
     "code": 0, 
     "data": {
@@ -266,22 +265,6 @@ e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
         "userId": 5760
     }, 
     "msg": "OK"
-}
-</pre>
-
-###Get all documents
-e.g. GET /trade
-<pre>
-
-</pre>
-
-###Get a bad document
-e.g. GET /trade?id=BAD
-<pre>
-{
-    "code": -14, 
-    "data": null, 
-    "msg": "Trade not found."
 }
 </pre>
 
@@ -305,6 +288,42 @@ e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
     "msg": "Trade not processed yet. Resent for processing."
 }
 <pre>
+
+###Delete a document
+Deletes from 'trades' and 'processed' tables
+
+e.g. DELETE /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
+<pre>
+{
+    "code": 0, 
+    "data": {}, 
+    "msg": "Trade deleted"
+}
+</pre>
+Test:
+e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
+<pre>
+{
+    "code": -14, 
+    "data": null, 
+    "msg": "Trade not found."
+}
+</pre>
+
+###Try to get a bad document
+e.g. GET /trade?id=BAD
+<pre>
+{
+    "code": -14, 
+    "data": null, 
+    "msg": "Trade not found."
+}
+
+###Get all documents
+*Not implemented*
+e.g. GET /trade
+
+</pre>
 
 r.db('cf').table('processed').get('029b5138-1d70-4aa5-b2c9-c09094580f1e').delete()
 

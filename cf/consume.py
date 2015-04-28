@@ -248,6 +248,18 @@ class AcceptTrade:
 #            r.connect('localhost', 28015).repl()
 #            req.context['data'] = r.db('cf').table('trades').run()
 
+    @falcon.before(max_body(0))
+    def on_delete(self, req, resp):
+        k = req.get_param('id', False)
+        req.context['data'] = {}
+        if (k):
+            r.connect('localhost', 28015).repl()
+            r.db('cf').table('trades').get(k).delete().run()
+            r.db('cf').table('processed').get(k).delete().run()
+            req.context['msg'] = "Trade deleted"
+        else:
+            req.context['msg'] = "Missing GET query param: id"
+            req.context['code'] = -14
 
 app = falcon.API(middleware=[
     JsonRequire(),
