@@ -48,7 +48,7 @@ def get_trade(k):
     """
     return r.db('cf').table('trades').get(k).run()
 
-@app.task()
+@app.task(default_retry_delay=300, max_retries=6)
 @database
 def process_trade(k):
     """
