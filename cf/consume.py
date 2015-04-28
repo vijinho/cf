@@ -48,9 +48,6 @@ class JsonDecode(object):
                                         'A valid JSON document is required.')
         try:
             req.context['json'] = json.loads(body.decode('utf-8'))
-            req.context['code'] = 0
-            req.context['msg'] = 'OK'
-            req.context['data'] = {}
         except (ValueError, UnicodeDecodeError):
             raise falcon.HTTPError(falcon.HTTP_753,
                                    'Malformed JSON',
@@ -65,13 +62,31 @@ class JsonDecode(object):
 
         ret = dict()
 
-        msg = req.context['msg']
-        code = int(req.context['code'])
-        if code != 0:
-            msg = "Error: {msg}".format(msg=msg)
-
+        if 'msg' in req.context:
+            msg = req.context['msg']
+            if msg is None:
+                msg = 'OK'
+        else:
+            msg = 'OK'
         ret['msg'] = msg
+
+        if 'code' in req.context:
+            code = int(req.context['code'])
+            if code is None:
+                code = 0
+            elif code < 0:
+                msg = "Error: {msg}".format(msg=msg)
+        else:
+            code = 0
         ret['code'] = code
+
+        if 'data' in req.context:
+            data = req.context['data']
+            if data is None:
+                data = {}
+            req.context['data']
+        else:
+            data = {}
         ret['data'] = req.context['data']
 
         resp.body = json.dumps(str(ret).encode('utf8'), indent=4,
@@ -205,6 +220,30 @@ class AcceptTrade:
                     t.process_trade.apply_async(args=[k], countdown=30, expires=dt.datetime.now() + dt.timedelta(minutes=10))
 
             req.context['data'] = data
+
+    @falcon.before(max_body(256))
+    def on_get(self, req, resp):
+        k = req.get_param('id', False)
+        req.context['data'] = {}
+        if (k):
+            r.connect('localhost', 28015).repl()
+            processed = r.db('cf').table('processed').get(k).run()
+            if processed:
+                req.context['data'] = processed
+            else:
+                trade = r.db('cf').table('trades').get(k).run()
+                req.context['data'] = trade
+                if trade:
+                    req.context['msg'] = "Trade not processed yet."
+                    req.context['code'] = 1
+                else:
+                    req.context['msg'] = "Trade not found."
+                    req.context['code'] = -14
+
+        else:
+            req.context['msg'] = "Missing GET query param: id"
+            req.context['code'] = -13
+
 
 app = falcon.API(middleware=[
     JsonRequire(),

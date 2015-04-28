@@ -39,7 +39,7 @@ def database(func):
         return func(*args, **kwargs)
     return connect
 
-@app.task
+@app.task(ignore_result=True,default_retry_delay=5, max_retries=12)
 @database
 def get_trade(k):
     """
@@ -49,7 +49,7 @@ def get_trade(k):
     """
     return r.db('cf').table('trades').get(k).run()
 
-@app.task(default_retry_delay=300, max_retries=6)
+@app.task(ignore_result=True,default_retry_delay=300, max_retries=6)
 @database
 def process_trade(k):
     """

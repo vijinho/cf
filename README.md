@@ -229,7 +229,6 @@ Starting: open a shell and `bin/start_gunicorn.sh`
 
 #Message Processor
 
-
 - Whenever a new task completed by celery it creates an entry in the 'processed' table using the same data from the original trade.
 - Once messages are in the 'processed' table they are considered valid and complete, and can be used to generate stats.
 - Important - I set up the message queue to start processing each individual 'trade' message from 30 seconds after the request with 10 minutes self-destruct if not processed.
@@ -239,7 +238,9 @@ Starting: open a shell and `bin/start_gunicorn.sh`
   - unixtime - the data converted to unix time in seconds, quicker to do calculations on
   - currencyPair - string of the currency market pair, e.g. EUR/GBP
   - originatingCountryName - the name of the originating country
-  
+
+GET /trade?id={ID} - Return (if processed) the JSON document for ID - e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
+ 
 ##Start Tasks Handler
 
 1. `bin/start_rabbitmq.sh`
