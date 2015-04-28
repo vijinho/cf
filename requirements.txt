@@ -3,6 +3,7 @@ distribute
 nose
 click
 rethinkdb
+reql-cli
 cython
 falcon
 gunicorn
