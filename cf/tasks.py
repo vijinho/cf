@@ -41,6 +41,18 @@ def database(func):
 
 @app.task(ignore_result=True,default_retry_delay=5, max_retries=12)
 @database
+def delete_trade(k):
+    """
+    Delete a trade
+    :param k: id of the item in the database
+    :return: True
+    """
+    r.db('cf').table('trades').get(k).delete().run()
+    r.db('cf').table('processed').get(k).delete().run()
+    return True
+
+@app.task(ignore_result=True,default_retry_delay=5, max_retries=12)
+@database
 def get_trade(k):
     """
     Get a submitted trade if it exists
