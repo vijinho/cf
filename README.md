@@ -239,8 +239,11 @@ Starting: open a shell and `bin/start_gunicorn.sh`
   - currencyPair - string of the currency market pair, e.g. EUR/GBP
   - originatingCountryName - the name of the originating country
 
-GET /trade?id={ID} - Return (if processed) the JSON document for ID - e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
- 
+GET /trade?id={ID} - Return (if processed) the JSON document for ID
+
+e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
+<pre>
+</pre>
 ##Start Tasks Handler
 
 1. `bin/start_rabbitmq.sh`

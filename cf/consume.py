@@ -89,7 +89,7 @@ class JsonDecode(object):
             data = {}
         ret['data'] = req.context['data']
 
-        resp.body = json.dumps(str(ret).encode('utf8'), indent=4,
+        resp.body = json.dumps(ret, indent=4,
                                sort_keys=True)
 
 
