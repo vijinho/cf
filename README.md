@@ -231,7 +231,11 @@ Starting: open a shell and `bin/start_gunicorn.sh`
 
 - Whenever a new task completed by celery it creates an entry in the 'processed' table using the same data from the original trade.
 - Once messages are in the 'processed' table they are considered valid and complete, and can be used to generate stats.
-
+- Does the following extra processing:
+  - amountEur - calculation of the amount traded in euros (for doing quick calculations of amounts being transferred)
+  - timestamp - the date format for 'timePlaced' is using 2-digit years - so this is converted to 'YYYY-MM-DD HH:MM:SS' format
+  - unixtime - the data converted to unix time in seconds, quicker to do calculations on
+  
 ##Start Tasks Handler
 
 1. `bin/start_rabbitmq.sh`
@@ -248,5 +252,18 @@ python
 >>> result.status
 u'SUCCESS'
 >>> result.get()
-{u'amountBuyEur': 4935.41, u'originatingCountry': u'US', u'userId': 16082, u'amountBuy': 49837.81, u'currencyFrom': u'USD', u'rate': 10.10309, u'timePlaced': u'23-MAR-13 11:46:10', u'currencyTo': u'HKD', u'amountSell': 6419, u'id': u'0000a961-2701-4174-997c-de1a1235e17c'}
+{
+"amountBuy": 4053.33 ,
+"amountEur": 486.12 ,
+"amountSell": 688 ,
+"currencyFrom":  "AUD" ,
+"currencyTo":  "HKD" ,
+"id":  "690d1778-7b48-45a1-b144-21a8e4526121" ,
+"originatingCountry":  "AU" ,
+"rate": 8.34545 ,
+"timePlaced":  "27-APR-15 23:57:27" ,
+"timestamp":  "2015-04-27 23:57:27" ,
+"unixtime":  "1430175447" ,
+"userId": 4975
+}
 </pre>

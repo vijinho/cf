@@ -341,8 +341,14 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
     trade['currencyTo'] = currency_to
 
     amount_sell = random_amount()
+
+    eur_amount = 0
     if currency_from == 'EUR':
         eur_amount = amount_sell
+    elif currency_to == 'EUR':
+        eur_amount = amount_sell
+
+    if eur_amount > 0:
         if not currency_from in year_rates or not currency_to in year_rates:
             return generate_trade(date_from=date_from, date_to=date_to,
                                   live=live,
@@ -365,13 +371,13 @@ def generate_trade(date_from=None, date_to=None, live=False, today=False,
         round(amount_sell, currencies[currency_from]['decimals']))
     trade['amountBuy'] = float(
         round(amount_buy, currencies[currency_to]['decimals']))
-    trade['amountBuyEur'] = float(
+    trade['amountEur'] = float(
         round(eur_amount, currencies[currency_to]['decimals']))
 
     trade['userId'] = get_weighted_userid(int("20" + str(trade['timePlaced'][7:9])))
 
     if return_json is True:
-        del trade['amountBuyEur']
+        del trade['amountEur']
         return json.dumps(trade, indent=4, sort_keys=True)
     return trade
 
@@ -396,8 +402,8 @@ def generate_trades_to_sum(max_sum=50000000, date_from=None, date_to=None,
     while total < max_sum:
         trade = generate_trade(date_from=date_from, date_to=date_to, live=live,
                                today=today)
-        total = total + trade['amountBuyEur']
-        del trade['amountBuyEur']
+        total = total + trade['amountEur']
+        del trade['amountEur']
         i += 1
         trades_list.append(trade)
 

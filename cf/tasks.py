@@ -7,7 +7,7 @@ import json
 import time
 from celery import Celery
 import rethinkdb as r
-#from cf import generate as g
+import generate as g
 from builtins import *
 
 __author__ = "Vijay Mahrra"
@@ -57,13 +57,33 @@ def process_trade(k):
     :return: the processed data item as JSON or False
     """
     trade = r.db('cf').table('trades').get(k).run()
+
     if trade:
         exists = r.db('cf').table('processed').get(k).run()
         if exists is None:
+            # create timestamp field (YYYY-MM-DD HH:MM:SS)
+            time_placed = trade['timePlaced']
+            ts_format='%d-%b-%y %H:%M:%S'
+            t = time.mktime(time.strptime(time_placed, ts_format))
+            trade['timestamp'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
+            trade['unixtime'] = time.strftime("%s", time.localtime(t))
+
+            # calculate the trade amount bought in euros
+            if 'EUR' in trade['currencyFrom']:
+                amount_buy = trade['currencyFrom']
+            elif 'EUR' in trade['currencyTo']:
+                amount_buy = trade['currencyTo']
+            else:
+                year_rates = g.rates['20' + trade['timePlaced'][7:9]]['rates']
+                eur_amount = trade['amountSell'] / year_rates[trade['currencyFrom']]
+                amount_buy = eur_amount * year_rates[trade['currencyTo']]
+                amount_buy = round(eur_amount, g.currencies[trade['currencyTo']]['decimals'])
+            trade['amountEur'] = amount_buy
+
             data = r.db('cf').table('processed').insert(trade).run()
             return data
         else:
-            return exists
+            return True
     else:
         return False
 
@@ -71,4 +91,4 @@ if __name__ == '__main__':
     #celeryctl purge
     from celery.task.control import discard_all
     discard_all()
-    print(process_trade('ca7a131b-6b8b-4541-a7e9-f4e1e6090400'))
+    print(process_trade('1e730047-520e-4c9b-a08e-d2fe7c9f198c'))
