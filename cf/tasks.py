@@ -79,6 +79,8 @@ def process_trade(k):
                 amount_buy = eur_amount * year_rates[trade['currencyTo']]
                 amount_buy = round(eur_amount, g.currencies[trade['currencyTo']]['decimals'])
             trade['amountEur'] = amount_buy
+            trade['currencyPair'] = "{0}/{1}".format(trade['currencyFrom'],trade['currencyTo'])
+            trade['originatingCountryName'] = g.countries[trade['originatingCountry']]['name']
 
             data = r.db('cf').table('processed').insert(trade).run()
             return data

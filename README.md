@@ -235,6 +235,8 @@ Starting: open a shell and `bin/start_gunicorn.sh`
   - amountEur - calculation of the amount traded in euros (for doing quick calculations of amounts being transferred)
   - timestamp - the date format for 'timePlaced' is using 2-digit years - so this is converted to 'YYYY-MM-DD HH:MM:SS' format
   - unixtime - the data converted to unix time in seconds, quicker to do calculations on
+  - currencyPair - string of the currency market pair, e.g. EUR/GBP
+  - originatingCountryName - the name of the originating country
   
 ##Start Tasks Handler
 
@@ -253,17 +255,19 @@ python
 u'SUCCESS'
 >>> result.get()
 {
-"amountBuy": 4053.33 ,
-"amountEur": 486.12 ,
-"amountSell": 688 ,
+"amountBuy": 82308 ,
+"amountEur": 637 ,
+"amountSell": 901 ,
 "currencyFrom":  "AUD" ,
-"currencyTo":  "HKD" ,
-"id":  "690d1778-7b48-45a1-b144-21a8e4526121" ,
+"currencyPair":  "AUD/JPY" ,
+"currencyTo":  "JPY" ,
+"id":  "267c3ee0-a3a7-40b2-929b-72ac5cfa6600" ,
 "originatingCountry":  "AU" ,
-"rate": 8.34545 ,
-"timePlaced":  "27-APR-15 23:57:27" ,
-"timestamp":  "2015-04-27 23:57:27" ,
-"unixtime":  "1430175447" ,
-"userId": 4975
+"originatingCountryName":  "Australia" ,
+"rate": 129.2924 ,
+"timePlaced":  "28-APR-15 00:11:56" ,
+"timestamp":  "2015-04-28 00:11:56" ,
+"unixtime":  "1430176316" ,
+"userId": 48973
 }
 </pre>
