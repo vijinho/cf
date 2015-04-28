@@ -227,6 +227,7 @@ class AcceptTrade:
         req.context['data'] = {}
         if (k):
             r.connect('localhost', 28015).repl()
+#            r.db('cf').table('processed').get(k).delete().run()
             processed = r.db('cf').table('processed').get(k).run()
             if processed:
                 req.context['data'] = processed
@@ -234,8 +235,9 @@ class AcceptTrade:
                 trade = r.db('cf').table('trades').get(k).run()
                 req.context['data'] = trade
                 if trade:
-                    req.context['msg'] = "Trade not processed yet."
+                    req.context['msg'] = "Trade not processed yet. Resent for processing."
                     req.context['code'] = 1
+                    t.process_trade.apply_async(args=[k], countdown=30, expires=dt.datetime.now() + dt.timedelta(minutes=10))
                 else:
                     req.context['msg'] = "Trade not found."
                     req.context['code'] = -14

@@ -239,11 +239,69 @@ Starting: open a shell and `bin/start_gunicorn.sh`
   - currencyPair - string of the currency market pair, e.g. EUR/GBP
   - originatingCountryName - the name of the originating country
 
-GET /trade?id={ID} - Return (if processed) the JSON document for ID
+##GET /trade?id=ID
 
+GET /trade?id={ID} - Returns the JSON document for ID. Auto-resubmit if found in 'trades' but not yet processed.
+
+###Get a processed document
 e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
 <pre>
+
+{
+    "code": 0, 
+    "data": {
+        "amountBuy": 12640.88, 
+        "amountEur": 8601.58, 
+        "amountSell": 9251, 
+        "currencyFrom": "USD", 
+        "currencyPair": "USD/SGD", 
+        "currencyTo": "SGD", 
+        "id": "029b5138-1d70-4aa5-b2c9-c09094580f1e", 
+        "originatingCountry": "US", 
+        "originatingCountryName": "United States", 
+        "rate": 1.48, 
+        "timePlaced": "28-APR-15 12:09:54", 
+        "timestamp": "2015-04-28 12:09:54", 
+        "unixtime": "1430219394", 
+        "userId": 5760
+    }, 
+    "msg": "OK"
+}
 </pre>
+
+###Get a bad document
+e.g. GET /trade?id=BAD
+<pre>
+{
+    "code": -14, 
+    "data": null, 
+    "msg": "Trade not found."
+}
+</pre>
+
+###Get a document, resubmit for processing if found in trades but not yet processed
+e.g. GET /trade?id=029b5138-1d70-4aa5-b2c9-c09094580f1e
+<pre>
+{
+    "code": 1, 
+    "data": {
+        "amountBuy": 12640.88, 
+        "amountEur": 8601.58, 
+        "amountSell": 9251, 
+        "currencyFrom": "USD", 
+        "currencyTo": "SGD", 
+        "id": "029b5138-1d70-4aa5-b2c9-c09094580f1e", 
+        "originatingCountry": "US", 
+        "rate": 1.48, 
+        "timePlaced": "28-APR-15 12:09:54", 
+        "userId": 5760
+    }, 
+    "msg": "Trade not processed yet. Resent for processing."
+}
+<pre>
+
+r.db('cf').table('processed').get('029b5138-1d70-4aa5-b2c9-c09094580f1e').delete()
+
 ##Start Tasks Handler
 
 1. `bin/start_rabbitmq.sh`
