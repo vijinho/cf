@@ -72,5 +72,5 @@ main.ini
 # Virtualenv
 venv
 
-data/aphorisms.db
-main.ini
+data/rethinkdb_data/
+erl_crash.dump
