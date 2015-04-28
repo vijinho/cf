@@ -229,8 +229,10 @@ Starting: open a shell and `bin/start_gunicorn.sh`
 
 #Message Processor
 
+
 - Whenever a new task completed by celery it creates an entry in the 'processed' table using the same data from the original trade.
 - Once messages are in the 'processed' table they are considered valid and complete, and can be used to generate stats.
+- Important - I set up the message queue to start processing each individual 'trade' message from 60 seconds after the request with 1 hour self-destruct if not processed.
 - Does the following extra processing:
   - amountEur - calculation of the amount traded in euros (for doing quick calculations of amounts being transferred)
   - timestamp - the date format for 'timePlaced' is using 2-digit years - so this is converted to 'YYYY-MM-DD HH:MM:SS' format
