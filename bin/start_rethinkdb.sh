@@ -1,1 +1,1 @@
-rethinkdb serve -d data/rethinkdb_data
+rethinkdb serve -d data/rethinkdb_data --bind all
